@@ -45,13 +45,35 @@ Hint: to choose a meaningful project look at the rest of the modeling tasks whic
 
 }
 
-Project Name: *My Project*
+Project Name: Internet Marketplace
 
-Project Type:
+Project Type: Website/Web Application
 
 Vision Statement:
+```
+For: Any person who could make an online purchase 
+     (most likely young adults and middle-aged people but nobody would be excluded)
+     
+Who: Require a place to easily find a product to purchase or sell their own
 
-Additional Information:
+The: Internet Marketplace
+
+Is: Website/Web Application
+
+That: Allows users to find links to access a product directly on the seller's website 
+      as well as being able to post about or sell their own products
+
+Unlike: Google shopping or ebay, the idea is to combine the best of both competitors and allow
+        for a platform to help users find what they require to purchase both through
+        certified sellers that may ship internationally as a company and any user that would like
+        to sell something they own
+Our Project: Aims to offer an online marketplace where people can find any kind of e-shopping site
+             and make the purchase that they truly want without being limited by a catalogue. The
+             project would like to offer a user the ability to find what they want by redirecting them to
+             specialized sellers.
+```
+
+Additional Information: If a website like this already exists, I am currently not aware of it. The project is born as an idea that could be developed in the future.
 
 
 
