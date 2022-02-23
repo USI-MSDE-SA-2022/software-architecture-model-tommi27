@@ -61,7 +61,9 @@ The: Internet Marketplace
 Is: Website/Web Application
 
 That: Allows users to find links to access a product directly on the seller's website 
-      as well as being able to post about or sell their own products
+      as well as being able to post about or sell their own products and, if a user is
+      selling their own product, allow interested users to contact the seller via an
+      integrated direct messaging tool
 
 Unlike: Google shopping or ebay, the idea is to combine the best of both competitors and allow
         for a platform to help users find what they require to purchase both through
