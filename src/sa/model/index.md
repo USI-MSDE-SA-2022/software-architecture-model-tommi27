@@ -1,5 +1,5 @@
 title: 
-Software Architecture Model
+Software Architecture Model by Tommaso Rodolfo Masera
 ---
  
 # Getting started
