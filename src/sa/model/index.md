@@ -99,6 +99,139 @@ Exceed: >2 ADR
 
 ![Architectural Decision Record Template](./examples/decision-template.madr)
 
+## __ADR #1__: Type of Software
+
+### Decision Made
+
+- The software will be built as a website.
+
+### Context of the Decision
+
+ - The context of the decision consists of finding the infrastructure of the software that would make the most sense and would reach as many users as possible.
+
+ - The objective of the choice is to be able to make the software easily accessible by anyone at any time from any device.
+
+- Given the requirements, the choice will fully impact the the architecture of the software as it involves the way it will be implemented from scratch.
+
+### Solved Problem
+
+- How can we provide our service?
+
+###  Alternatives Considered
+
+- Website
+- Web Application
+- Mobile Application
+
+### Choice Made
+
+- Website
+
+### Reason for the Choice
+
+In order to achieve the purpose of the software, a website would be the more suitable option over a web application or a mobile application because, firstly, a mobile application would not be able to reach people on other non-portable devices while a website and a web application would be accessible via a browser from any device given proper support.
+
+Furthermore, what motivates the choice from website over web application is the fact that a website would fit more the goals of the software. The main purpose of the software is to allow users to find (anonymously or with an account) products and then be redirected towards the seller of that product, the website acts as an easier search tool for online shopping without providing a real service through its main purpose.
+
+An argument could be made that a web application would suit best the ability for transactions to occur between users that generated their own content but, even then, what the website does is to allow them to get in contact and contract on their own.
+
+Therefore, from a practical point of view, a website would be a more intuitive and direct approach than a web application.
+
+## __ADR #2__: Crawling Technology
+
+### Decision Made
+
+- The web crawling framework will be Scrapy.
+
+### Context of the Decision
+
+ - The context and the objective to achieve with this decision is to have a tool that can allow
+for web crawling given that the final website will be hosting data crawled directly from sellers' websites.
+
+ - The main requirement of this choice is to get all possible crawled products as up to date as possible so they can be displayed.
+
+- Given that its purpose is to obtain the very data that will be displayed on the website, the scope of the decision will affect a great part of the architecture with the exception of user-created content such as posts as those will not require any crawling.
+
+### Solved Problem
+
+- How can we obtain the core data necessary to the website?
+
+###  Alternatives Considered
+
+| Framework | Language |
+|---|---|
+|Scrapy| Python |
+| BeautifulSoup | Python |
+| Cheerio | PHP |
+| Kimura | Ruby |
+| Goutte | PHP |
+
+### Choice Made
+
+- Scrapy
+
+### Reason for the Choice
+
+Pros:
+
+* Familiarity with the framework
+* Simplicity of the programming language that the framework is implemented in
+* Scrapy:
+  - extracts data in different formats (CSV, JSON, XML)
+  - allows for asynchronous crawling of pages
+  - does not take up too much memory or CPU
+  - can extract large amounts of data
+  - is fast and regulates speed for crawlers automatically
+
+Cons:
+
+* Scrapy does not handle JavaScript 
+* Works only with versions of Python after 2.7 (included)
+
+## __ADR #3__: Search Technology
+
+### Decision Made
+
+- The search functionality of the website will be Elasticsearch.
+
+### Context of the Decision
+
+ - The context of the decision stems from the fact that we need to provide users with a search functionality that will match what they find on the website as closely as possible to what they are looking for. Moreover, this search takes place over a massive amount of data and is required to be fast and to the point.
+
+ - The main objective of the choice is to query the crawled data as efficiently and effectively as possible in order to provide the user with the best products.
+
+- This decision will likely affect the architecture in its entirety. The search functionality would take into account both crawled and user-generated content leaving no products out of the picture.
+
+### Solved Problem
+
+- How can we provide the users with fast and relevant search results?
+
+###  Alternatives Considered
+
+- Elasticsearch
+- Solr
+- Sphinx
+
+### Choice Made
+
+- Elasticsearch
+
+### Reason for the Choice
+
+Pros:
+
+* Horizontally scalable
+* Schema-less
+* Fastest among the options
+* Suited for data that updates frequently
+* Open-source
+* Integrated data visualization with Kibana
+
+Cons:
+
+* Not good for persistent storage
+* The API is not great 
+
 
 # Ex - Quality Attribute Scenario
 
