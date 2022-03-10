@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>Software Architecture Model</title>
+    <title>Software Architecture Model by Tommaso Rodolfo Masera</title>
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Fira+Sans|Fira+Mono">
     <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.0/build/styles/default.min.css">
     <style>
@@ -200,7 +200,7 @@ flex-direction: column}
         </svg>
         <div class="title">
             <h2></h2>
-            <h1>Software Architecture Model</h1>
+            <h1>Software Architecture Model by Tommaso Rodolfo Masera</h1>
         </div>
         <ul>
             <li>Prof. Cesare Pautasso</li>
@@ -232,10 +232,33 @@ Our Project [summarize main advantages over status quo, unique selling point]
 </ul>
 <p>The chosen domain should be unique for each student.</p>
 <p>Please be ready to give a 2 minute presentation about it (you can use a slide but it&#39;s not necessary)</p>
-<section class="hint"><span>Hint: </span>to choose a meaningful project look at the rest of the modeling tasks which you are going to perform in the context of your domain.</section></section><p>Project Name: <em>My Project</em></p>
-<p>Project Type:</p>
+<section class="hint"><span>Hint: </span>to choose a meaningful project look at the rest of the modeling tasks which you are going to perform in the context of your domain.</section></section><p>Project Name: Internet Marketplace</p>
+<p>Project Type: Website/Web Application</p>
 <p>Vision Statement:</p>
-<p>Additional Information:</p>
+<pre><code>For: Any person who could make an online purchase 
+     (most likely young adults and middle-aged people but nobody would be excluded)
+     
+Who: Require a place to easily find a product to purchase or sell their own
+
+The: Internet Marketplace
+
+Is: Website/Web Application
+
+That: Allows users to find links to access a product directly on the seller&#39;s website 
+      as well as being able to post about or sell their own products and, if a user is
+      selling their own product, allow interested users to contact the seller via an
+      integrated direct messaging tool
+
+Unlike: Google shopping or ebay, the idea is to combine the best of both competitors and allow
+        for a platform to help users find what they require to purchase both through
+        certified sellers that may ship internationally as a company and any user that would like
+        to sell something they own
+Our Project: Aims to offer an online marketplace where people can find any kind of e-shopping site
+             and make the purchase that they truly want without being limited by a catalogue. The
+             project would like to offer a user the ability to find what they want by redirecting them to
+             specialized sellers.
+</code></pre>
+<p>Additional Information: If a website like this already exists, I am currently not aware of it. The project is born as an idea that could be developed in the future.</p>
 <h1 id="ex---architectural-decision-records"><span class='task'>2.</span>  Architectural Decision Records</h1>
 <section class="instructions"><p>Software architecture is about making design decisions that will impact the quality of the software you plan to build.</p>
 <p>Let&#39;s practice how to describe an architectural decision. We will keep using ADRs to document architectural decisions in the rest of the model.</p>
@@ -276,6 +299,153 @@ Our Project [summarize main advantages over status quo, unique selling point]
 <li>quality degradation</li>
 </ul>
 </p>
+<h2 id="adr-1-type-of-software"><strong>ADR #1</strong>: Type of Software</h2>
+<h3 id="decision-made">Decision Made</h3>
+<ul>
+<li>The software will be built as a website.</li>
+</ul>
+<h3 id="context-of-the-decision">Context of the Decision</h3>
+<ul>
+<li><p>The context of the decision consists of finding the infrastructure of the software that would make the most sense and would reach as many users as possible.</p>
+</li>
+<li><p>The objective of the choice is to be able to make the software easily accessible by anyone at any time from any device.</p>
+</li>
+<li><p>Given the requirements, the choice will fully impact the the architecture of the software as it involves the way it will be implemented from scratch.</p>
+</li>
+</ul>
+<h3 id="solved-problem">Solved Problem</h3>
+<ul>
+<li>How can we provide our service?</li>
+</ul>
+<h3 id="alternatives-considered">Alternatives Considered</h3>
+<ul>
+<li>Website</li>
+<li>Web Application</li>
+<li>Mobile Application</li>
+</ul>
+<h3 id="choice-made">Choice Made</h3>
+<ul>
+<li>Website</li>
+</ul>
+<h3 id="reason-for-the-choice">Reason for the Choice</h3>
+<p>In order to achieve the purpose of the software, a website would be the more suitable option over a web application or a mobile application because, firstly, a mobile application would not be able to reach people on other non-portable devices while a website and a web application would be accessible via a browser from any device given proper support.</p>
+<p>Furthermore, what motivates the choice from website over web application is the fact that a website would fit more the goals of the software. The main purpose of the software is to allow users to find (anonymously or with an account) products and then be redirected towards the seller of that product, the website acts as an easier search tool for online shopping without providing a real service through its main purpose.</p>
+<p>An argument could be made that a web application would suit best the ability for transactions to occur between users that generated their own content but, even then, what the website does is to allow them to get in contact and contract on their own.</p>
+<p>Therefore, from a practical point of view, a website would be a more intuitive and direct approach than a web application.</p>
+<h2 id="adr-2-crawling-technology"><strong>ADR #2</strong>: Crawling Technology</h2>
+<h3 id="decision-made-1">Decision Made</h3>
+<ul>
+<li>The web crawling framework will be Scrapy.</li>
+</ul>
+<h3 id="context-of-the-decision-1">Context of the Decision</h3>
+<ul>
+<li><p>The context and the objective to achieve with this decision is to have a tool that can allow
+for web crawling given that the final website will be hosting data crawled directly from sellers&#39; websites.</p>
+</li>
+<li><p>The main requirement of this choice is to get all possible crawled products as up to date as possible so they can be displayed.</p>
+</li>
+<li><p>Given that its purpose is to obtain the very data that will be displayed on the website, the scope of the decision will affect a great part of the architecture with the exception of user-created content such as posts as those will not require any crawling.</p>
+</li>
+</ul>
+<h3 id="solved-problem-1">Solved Problem</h3>
+<ul>
+<li>How can we obtain the core data necessary to the website?</li>
+</ul>
+<h3 id="alternatives-considered-1">Alternatives Considered</h3>
+<table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Language</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Scrapy</td>
+<td>Python</td>
+</tr>
+<tr>
+<td>BeautifulSoup</td>
+<td>Python</td>
+</tr>
+<tr>
+<td>Cheerio</td>
+<td>PHP</td>
+</tr>
+<tr>
+<td>Kimura</td>
+<td>Ruby</td>
+</tr>
+<tr>
+<td>Goutte</td>
+<td>PHP</td>
+</tr>
+</tbody></table>
+<h3 id="choice-made-1">Choice Made</h3>
+<ul>
+<li>Scrapy</li>
+</ul>
+<h3 id="reason-for-the-choice-1">Reason for the Choice</h3>
+<p>Pros:</p>
+<ul>
+<li>Familiarity with the framework</li>
+<li>Simplicity of the programming language that the framework is implemented in</li>
+<li>Scrapy:<ul>
+<li>extracts data in different formats (CSV, JSON, XML)</li>
+<li>allows for asynchronous crawling of pages</li>
+<li>does not take up too much memory or CPU</li>
+<li>can extract large amounts of data</li>
+<li>is fast and regulates speed for crawlers automatically</li>
+</ul>
+</li>
+</ul>
+<p>Cons:</p>
+<ul>
+<li>Scrapy does not handle JavaScript </li>
+<li>Works only with versions of Python after 2.7 (included)</li>
+</ul>
+<h2 id="adr-3-search-technology"><strong>ADR #3</strong>: Search Technology</h2>
+<h3 id="decision-made-2">Decision Made</h3>
+<ul>
+<li>The search functionality of the website will be Elasticsearch.</li>
+</ul>
+<h3 id="context-of-the-decision-2">Context of the Decision</h3>
+<ul>
+<li><p>The context of the decision stems from the fact that we need to provide users with a search functionality that will match what they find on the website as closely as possible to what they are looking for. Moreover, this search takes place over a massive amount of data and is required to be fast and to the point.</p>
+</li>
+<li><p>The main objective of the choice is to query the crawled data as efficiently and effectively as possible in order to provide the user with the best products.</p>
+</li>
+<li><p>This decision will likely affect the architecture in its entirety. The search functionality would take into account both crawled and user-generated content leaving no products out of the picture.</p>
+</li>
+</ul>
+<h3 id="solved-problem-2">Solved Problem</h3>
+<ul>
+<li>How can we provide the users with fast and relevant search results?</li>
+</ul>
+<h3 id="alternatives-considered-2">Alternatives Considered</h3>
+<ul>
+<li>Elasticsearch</li>
+<li>Solr</li>
+<li>Sphinx</li>
+</ul>
+<h3 id="choice-made-2">Choice Made</h3>
+<ul>
+<li>Elasticsearch</li>
+</ul>
+<h3 id="reason-for-the-choice-2">Reason for the Choice</h3>
+<p>Pros:</p>
+<ul>
+<li>Horizontally scalable</li>
+<li>Schema-less</li>
+<li>Fastest among the options</li>
+<li>Suited for data that updates frequently</li>
+<li>Open-source</li>
+<li>Integrated data visualization with Kibana</li>
+</ul>
+<p>Cons:</p>
+<ul>
+<li>Not good for persistent storage</li>
+<li>API can be hard to use and to learn</li>
+</ul>
 <h1 id="ex---quality-attribute-scenario"><span class='task'>3.</span>  Quality Attribute Scenario</h1>
 <section class="instructions"><ol>
 <li><p>Pick a scenario for a specific quality attribute. Describe it with natural language.</p>
@@ -291,7 +461,16 @@ Our Project [summarize main advantages over status quo, unique selling point]
 <section class="pass"><span>&starf;&star;&star;: </span>3 scenarios</section><section class="ok"><span>&starf;&starf;&star;: </span>&gt;3 scenarios</section><section class="exceed"><span>&starf;&starf;&starf;: </span>&gt;6 scenarios using challenging qualities</section></section><h2 id="example-scenario">Example Scenario</h2>
 <p>Quality: <em>Recoverability</em></p>
 <p>Scenario: In case of power failure, rebooting the system should take up to 20 seconds.</p>
-<img src="./puml_e1.svg"><h1 id="ex---quality-attribute-tradeoff"><span class='task'>4.</span>  Quality Attribute Tradeoff</h1>
+<img src="./puml_e1.svg"><h2 id="scenario-1">Scenario 1</h2>
+<p>Quality: <em>Availability</em></p>
+<p>Scenario: To provide up-to-date information on the website, the data will be crawled at regular intervals between 12h and 48h (to be decided).</p>
+<img src="./puml_e2.svg"><h2 id="scenario-2">Scenario 2</h2>
+<p>Quality: <em>Compatibility</em></p>
+<p>Scenario: Given that the system will be accessed by users via a web browser, the system should be able to display properly on as many devices and web browsers as possible.</p>
+<img src="./puml_e3.svg"><h2 id="scenario-3">Scenario 3</h2>
+<p>Quality: <em>Scalability</em></p>
+<p>Scenario: The system should be able to handle an increasing number of users and data without critically hindering performance.</p>
+<img src="./puml_e4.svg"><h1 id="ex---quality-attribute-tradeoff"><span class='task'>4.</span>  Quality Attribute Tradeoff</h1>
 <section class="instructions"><p>Pick a free combination of two qualities on the <a href="https://usi365.sharepoint.com/:x:/s/MSDE-2022-SoftwareArchitecture/ESVksoXVgMNHtKBKrIwatMYBqorOFaKjxnoqssEy0gNPCg?e=81W7SI">map</a> and write your name to claim it.</p>
 <p>Then write a short text giving an example for the tradeoff in this assignment.</p>
 <section class="pass"><span>&starf;&star;&star;: </span>1 unique trade-off</section><section class="ok"><span>&starf;&starf;&star;: </span>2 trade-offs</section><section class="exceed"><span>&starf;&starf;&starf;: </span>&gt;2 trade-offs</section></section><h2 id="portability-vs-performance-example">Portability vs. Performance (Example)</h2>
@@ -319,7 +498,7 @@ Our Project [summarize main advantages over status quo, unique selling point]
 <p>You can add additional process views showing how other use cases can be satisfied by the same set of components.</p>
 <p>This assignment will focus on modularity-related decisions, we will worry about deployment and the container view later.</p>
 <p>Here is a PlantUML example logical view and process view.</p>
-<img src="./puml_e2.svg"><img src="./puml_e3.svg"><section class="hint"><span>Hint: </span>How to connect sub-components to other external components? Use this pattern.</section><img src="./puml_e4.svg"><section class="pass"><span>&starf;&star;&star;: </span>6 components (1 decomposed), 1 use case/process view</section><section class="ok"><span>&starf;&starf;&star;: </span>6 components (1 decomposed), 2 use case/process view</section><section class="exceed"><span>&starf;&starf;&starf;: </span>&gt;6 components (&gt;1 decomposed) and &gt;2 use case/process view</section></section><h2 id="logical-view">Logical View</h2>
+<img src="./puml_e5.svg"><img src="./puml_e6.svg"><section class="hint"><span>Hint: </span>How to connect sub-components to other external components? Use this pattern.</section><img src="./puml_e7.svg"><section class="pass"><span>&starf;&star;&star;: </span>6 components (1 decomposed), 1 use case/process view</section><section class="ok"><span>&starf;&starf;&star;: </span>6 components (1 decomposed), 2 use case/process view</section><section class="exceed"><span>&starf;&starf;&starf;: </span>&gt;6 components (&gt;1 decomposed) and &gt;2 use case/process view</section></section><h2 id="logical-view">Logical View</h2>
 <h2 id="process-views">Process Views</h2>
 <p>Use Case: </p>
 <h1 id="ex---component-model-bottom-up"><span class='task'>8.</span>  Component Model: Bottom-Up</h1>

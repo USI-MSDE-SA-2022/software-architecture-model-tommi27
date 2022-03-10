@@ -230,7 +230,7 @@ Pros:
 Cons:
 
 * Not good for persistent storage
-* The API is not great 
+* API can be hard to use and to learn
 
 
 # Ex - Quality Attribute Scenario
@@ -303,7 +303,89 @@ Source -> [System] : "Boot"
 
 @enduml
 ```
+
+## Scenario 1
+
+Quality: _Availability_
+
+Scenario: To provide up-to-date information on the website, the data will be crawled at regular intervals between 12h and 48h (to be decided).
  
+ ```puml
+@startuml
+
+skinparam componentStyle rectangle
+skinparam monochrome true
+skinparam shadowing false
+
+rectangle "Updating Data" {
+
+rectangle "Automatic Script" as Source
+rectangle "Every 12h to 48h" as Measure
+
+Source -> [System] : "Request Update"
+
+[System] -> [Measure] : "Run Crawlers"
+
+}
+
+@enduml
+```
+
+## Scenario 2
+
+Quality: _Compatibility_
+
+Scenario: Given that the system will be accessed by users via a web browser, the system should be able to display properly on as many devices and web browsers as possible.
+
+```puml
+@startuml
+
+skinparam componentStyle rectangle
+skinparam monochrome true
+skinparam shadowing false
+
+rectangle "Proper Display on Devices/Browsers" {
+
+rectangle "User" as Source
+rectangle "Every 12h to 48h" as Measure
+
+Source -> [System] : "Visit Website"
+
+[System] -> [Measure] : "Display Properly"
+
+}
+
+@enduml
+```
+
+## Scenario 3
+
+Quality: _Scalability_
+
+Scenario: The system should be able to handle an increasing number of users and data without critically hindering performance.
+
+```puml
+@startuml
+
+skinparam componentStyle rectangle
+skinparam monochrome true
+skinparam shadowing false
+
+rectangle "Scale Up" {
+
+rectangle "User Growth" as Source
+rectangle "Performance" as Measure
+
+Source -> [System] : "Increase Requests"
+
+[System] -> [Measure] : "Minor Impact"
+
+}
+
+@enduml
+```
+
+
 
 # Ex - Quality Attribute Tradeoff
 
