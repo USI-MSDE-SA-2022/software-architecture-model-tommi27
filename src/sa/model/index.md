@@ -306,7 +306,7 @@ Source -> [System] : "Boot"
 
 ## Scenario 1
 
-Quality: _Availability_
+Quality: _Freshness_
 
 Scenario: To provide up-to-date information on the website, the data will be crawled at regular intervals between 12h and 48h (to be decided).
  
@@ -347,11 +347,11 @@ skinparam shadowing false
 rectangle "Proper Display on Devices/Browsers" {
 
 rectangle "User" as Source
-rectangle "Information/Webpages" as Measure
+rectangle "Proper Display according to a Decided Design" as Measure
 
 Source -> [Website] : "Visit"
 
-[Website] -> [Measure] : "Display Properly"
+[Website] -> [Measure] : "Information/Webpages"
 
 }
 
@@ -401,11 +401,11 @@ skinparam shadowing false
 rectangle "Simple and Clean Interface" {
 
 rectangle "User" as Source
-rectangle "Overwhelming" as Measure
+rectangle "Not Overwhelming" as Measure
 
 Source -> [Website] : "Visit"
 
-[Website] -> [Measure] : "Is Not"
+[Website] -> [Measure] : "Webpage"
 
 }
 
@@ -455,11 +455,11 @@ skinparam shadowing false
 rectangle "Account Creation" {
 
 rectangle "User" as Source
-rectangle "Sensitive Data" as Measure
+rectangle "Not Sensitive" as Measure
 
-Source -> [System] : "Create Account"
+Source -> [System] : "Username, Email, Password"
 
-[System] -> [Measure] : "Does not Receive nor Send"
+[System] -> [Measure] : "Received and Response Data"
 
 }
 
@@ -470,7 +470,7 @@ Source -> [System] : "Create Account"
 
 Quality: _Feasibility (Affordability)_
 
-Scenario: The system may lack data if crawlers are blocked or if there is no legal permission to craw a website.
+Scenario: The system may lack data if crawlers are blocked or if there is no legal permission to crawl a website.
 
 ```puml
 @startuml
@@ -482,11 +482,11 @@ skinparam shadowing false
 rectangle "Retrieving Information" {
 
 rectangle "Crawler" as Source
-rectangle "Relevant Data" as Measure
+rectangle "Retrieval Authorization" as Measure
 
 Source -> [Third Party] : "Crawls"
 
-[Third Party] -> [Measure] : "May Not Allow Retrieval"
+[Third Party] -> [Measure] : "Relevant Data"
 
 }
 
