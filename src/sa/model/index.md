@@ -347,11 +347,11 @@ skinparam shadowing false
 rectangle "Proper Display on Devices/Browsers" {
 
 rectangle "User" as Source
-rectangle "Every 12h to 48h" as Measure
+rectangle "Information/Webpages" as Measure
 
-Source -> [System] : "Visit Website"
+Source -> [Website] : "Visit"
 
-[System] -> [Measure] : "Display Properly"
+[Website] -> [Measure] : "Display Properly"
 
 }
 
@@ -371,7 +371,7 @@ skinparam componentStyle rectangle
 skinparam monochrome true
 skinparam shadowing false
 
-rectangle "Scale Up" {
+rectangle "Growing Number of Users" {
 
 rectangle "User Growth" as Source
 rectangle "Performance" as Measure
@@ -385,6 +385,113 @@ Source -> [System] : "Increase Requests"
 @enduml
 ```
 
+## Scenario 4
+
+Quality: _Simplicity_
+
+Scenario: The user interface should be simple and lightweight to not overwhelm users with too much information at once.
+
+```puml
+@startuml
+
+skinparam componentStyle rectangle
+skinparam monochrome true
+skinparam shadowing false
+
+rectangle "Simple and Clean Interface" {
+
+rectangle "User" as Source
+rectangle "Overwhelming" as Measure
+
+Source -> [Website] : "Visit"
+
+[Website] -> [Measure] : "Is Not"
+
+}
+
+@enduml
+```
+
+## Scenario 5
+
+Quality: _Learnability_
+
+Scenario: The user interface should resemble familiar and common interfaces to minimize as much as possible the learning curve of the user and allow them to use the website within 2 minutes of their arrival.
+
+```puml
+@startuml
+
+skinparam componentStyle rectangle
+skinparam monochrome true
+skinparam shadowing false
+
+rectangle "Familiar and Intuitive Interface" {
+
+rectangle "User" as Source
+rectangle "Proper Usage within 2 Minutes" as Measure
+
+Source -> [Website] : "Visit"
+
+[Website] -> [Measure] : "Allow"
+
+}
+
+@enduml
+```
+
+## Scenario 6
+
+Quality: _Privacy_
+
+Scenario: Account creation should be optional and will not require anything other than a username, an email and a password without asking for any sensitive information.
+
+```puml
+@startuml
+
+skinparam componentStyle rectangle
+skinparam monochrome true
+skinparam shadowing false
+
+rectangle "Account Creation" {
+
+rectangle "User" as Source
+rectangle "Sensitive Data" as Measure
+
+Source -> [System] : "Create Account"
+
+[System] -> [Measure] : "Does not Receive nor Send"
+
+}
+
+@enduml
+```
+
+## Scenario 7
+
+Quality: _Feasibility (Affordability)_
+
+Scenario: The system may lack data if crawlers are blocked or if there is no legal permission to craw a website.
+
+```puml
+@startuml
+
+skinparam componentStyle rectangle
+skinparam monochrome true
+skinparam shadowing false
+
+rectangle "Retrieving Information" {
+
+rectangle "Crawler" as Source
+rectangle "Relevant Data" as Measure
+
+Source -> [Third Party] : "Crawls"
+
+[Third Party] -> [Measure] : "May Not Allow Retrieval"
+
+}
+
+@enduml
+```
 
 
 # Ex - Quality Attribute Tradeoff
