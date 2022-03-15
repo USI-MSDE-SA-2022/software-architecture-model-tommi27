@@ -514,6 +514,18 @@ Exceed: >2 trade-offs
 
 Developing an app natively for each OS is expensive and time consuming, but it benefits from a good performance. Choosing a cross-platform environment on the other hand simplify the development process, making it faster and cheaper, but it might suffer in performance.
 
+## Availability vs. Feasibility
+
+Crawling any possible website for data would increase the availability of information on the domain but would imply getting blocked or even breaking the law. Crawling only websites that gave permission to do so would allow the domain to exist without any violations but would reduce the available data over the website.
+
+## Privacy vs. Customizability
+
+If the website were to provide a recommender system to users to suggest products to users, it would benefit from asking for data such as age or gender of the user to improve the recommendations but it would imply that we would possibly store sensitive data regarding the user. On the other hand, to the benefit of privacy we could not store any data that to be fed to a recommender system and, therefore, its accuracy may initially suffer.
+
+## Availability as Freshness vs Durability
+
+Bringing fresh data to the users would imply a frequent refresh of the entirety of the data that we store meaning that, while we would use a persisent storage to achieve it, we do not care about keeping old products but only about the most recent and available ones and we would lose long term durability of the data. Storing permanently all the data that we frequently refresh would allow for an immense database but it would not benefit the service whatsoever as we would not use the old data in any way. Additionally, we could argue that keeping so much data could hinder the capacity of the system as the data will grow very quickly.
+
 # Ex - Feature Modeling
 
 {.instructions
