@@ -546,6 +546,8 @@ Exceed: Include more than 8 non-trivial features, indicate which are found in yo
 
 }
 
+![Feature Model](./fm.fml)
+
 
 # Ex - Context Diagram
 
@@ -567,7 +569,7 @@ Exceed: >1 User and >1 Dependency, with both incoming and outgoing dependencies
 
 }
 
-
+![Context Diagram](./context.puml)
 
 
 # Ex - Component Model: Top-Down
