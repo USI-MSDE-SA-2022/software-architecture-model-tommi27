@@ -699,6 +699,7 @@ interface " " as UII
 interface " " as PVI
 interface " " as RSE
 interface " " as RSB
+interface " " as TPSI
 [Database <$database{scale=0.33}>] as DB 
 [Web Crawler] as WC
 component UI as "User Interface" {
@@ -713,6 +714,10 @@ component "User Posts" as UP {
   component "Product Post" as PP
   component "Non-Product Post" as NPP 
 }
+[Third Party Service] as TPS
+
+WC -(TPSI
+TPSI - TPS
 
 DB -( WCI
 WCI - WC
