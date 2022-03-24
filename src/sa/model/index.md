@@ -695,34 +695,36 @@ interface " " as SBI
 interface " " as UPI
 interface " " as LAY1
 interface " " as RSI
-interface " " as UII
+interface " " as PCI
 interface " " as PVI
 interface " " as RSE
-interface " " as RSB
+
 interface " " as TPSI
 [Database <$database{scale=0.33}>] as DB 
 [Web Crawler] as WC
 component UI as "User Interface" {
-   component PV as "Product View"
-   component SB as "Search Bar"
-   component CB as "Category Browser"
+  component PV as "Product View"
+  component SB as "Search Bar"
+  component CB as "Category Browser"
+  component "User Posts" as UP {
+    component "Product Post" as PP
+    component "Non-Product Post" as NPP 
+  }
 }
 [Recommender System] as RS
 [Search Engine] as SE
 [Browser Engine] as BE
-component "User Posts" as UP {
-  component "Product Post" as PP
-  component "Non-Product Post" as NPP 
-}
+[Messaging Tool] as PC
+
 [Third Party Service] as TPS
 
 WC -(TPSI
 TPSI - TPS
 
-DB -( WCI
-WCI - WC
-DB --( UPI
-UPI -- PP
+DB - WCI
+WCI )- WC
+DB -- UPI
+UPI )-- PP
 
 LAY1 -- DB
 RS -( RSI
@@ -743,14 +745,13 @@ CBI -- BE
 PV --( PVI
 PVI -- LAY1
 
-UI -( UII
-UII - UP
+SE --( RSE
 
-SE -- RSE
-RSE )-- RS
+BE --( RSE
+RSE -- RS
 
-BE -- RSB
-RSB )-- RS
+PC -( PCI
+PCI - UI
 
 
 skinparam monochrome true
@@ -769,6 +770,7 @@ title User Search and Browse
 
 participant "User Interface" as UI
 participant "User Posts" as UP
+participant "Messaging Tool" as MT
 participant "Web Crawler" as WC
 participant "Search Engine" as SE
 participant "Browser Engine" as BE
@@ -776,16 +778,21 @@ participant "Database" as DB
 participant "Recommender System" as RS
 participant "Third Party Site" as TPS
 
+alt Browser Engine
 UI -> BE: Browse Categories
 BE -> DB: Look Up Category
 DB -> BE: Return Products based on Category
 BE -> UI: Display Returned Products
 BE -> RS: Learn from Browse Result
+
+else Search Engine
 UI -> SE: Search Product
 SE -> DB: Look For Product
 DB -> SE: Return Relevant Products
 SE -> UI: Display Returned Products
 SE -> RS: Learn from Search Result
+end
+
 UI -> TPS: Redirect User to Product Purchase
 
 
@@ -803,6 +810,7 @@ title User Post or Crawled Data
 
 participant "User Interface" as UI
 participant "User Posts" as UP
+participant "Messaging Tool" as MT
 participant "Web Crawler" as WC
 participant "Search Engine" as SE
 participant "Browser Engine" as BE
@@ -810,16 +818,19 @@ participant "Database" as DB
 participant "Recommender System" as RS
 participant "Third Party Site" as TPS
 
+alt User Posts Product
 UI -> UP: Post Product
 UP -> DB: Store Product Post
 DB -> BE: Update with New Post
 DB -> SE: Update with New Post
 
+else Crawl Data
 WC -> TPS: Crawl Data
 TPS -> WC: Return Found Data
 WC -> DB: Store Crawled Data
 DB -> BE: Update with New Data
 DB -> SE: Update with New Data
+end
 
 BE -> UI: Display Updated Products
 SE -> UI: Display Updated Products
@@ -839,6 +850,7 @@ title Contact Other Users
 
 participant "User Interface" as UI
 participant "User Posts" as UP
+participant "Messaging Tool" as MT
 participant "Web Crawler" as WC
 participant "Search Engine" as SE
 participant "Browser Engine" as BE
@@ -848,8 +860,8 @@ participant "Third Party Site" as TPS
 
 UI -> UP: Look up Post
 UI -> UP: Contact Post Author
-UP -> UP: Discuss Price/Payment
-UP -> TPS: Redirect to External Site for Payment
+UP -> MT: Discuss Price/Payment
+MT -> TPS: Redirect to External Site for Payment
 UP -> RS: Learn from User Activity
 
 
