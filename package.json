@@ -20,5 +20,5 @@
     "clean": "rm -rf upload/*",
     "watch": "onchange src/** -- yarn build"
   },
-  "doc_build": 204
+  "doc_build": 364
 }

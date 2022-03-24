@@ -680,12 +680,179 @@ Exceed: >6 components (>1 decomposed) and >2 use case/process view
 
 ## Logical View
 
+```puml
+@startuml
+skinparam componentStyle rectangle
 
+!include <tupadr3/font-awesome/database>
+
+title Internet Marketplace Logical View
+interface " " as WCI
+interface " " as SEI
+interface " " as BEI
+interface " " as CBI
+interface " " as SBI
+interface " " as UPI
+interface " " as LAY1
+interface " " as RSI
+interface " " as UII
+interface " " as PVI
+interface " " as RSE
+interface " " as RSB
+[Database <$database{scale=0.33}>] as DB 
+[Web Crawler] as WC
+component UI as "User Interface" {
+   component PV as "Product View"
+   component SB as "Search Bar"
+   component CB as "Category Browser"
+}
+[Recommender System] as RS
+[Search Engine] as SE
+[Browser Engine] as BE
+component "User Posts" as UP {
+  component "Product Post" as PP
+  component "Non-Product Post" as NPP 
+}
+
+DB -( WCI
+WCI - WC
+DB --( UPI
+UPI -- PP
+
+LAY1 -- DB
+RS -( RSI
+RSI - DB
+
+SE -( SEI
+SEI - LAY1
+
+LAY1 - BEI
+BEI )- BE
+
+SB --( SBI
+SBI -- SE
+
+CB --( CBI
+CBI -- BE
+
+PV --( PVI
+PVI -- LAY1
+
+UI -( UII
+UII - UP
+
+SE -- RSE
+RSE )-- RS
+
+BE -- RSB
+RSB )-- RS
+
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
 
 ## Process Views
 
-Use Case: 
+### User Search and Browse
 
+```puml
+@startuml
+title User Search and Browse
+
+participant "User Interface" as UI
+participant "User Posts" as UP
+participant "Web Crawler" as WC
+participant "Search Engine" as SE
+participant "Browser Engine" as BE
+participant "Database" as DB
+participant "Recommender System" as RS
+participant "Third Party Site" as TPS
+
+UI -> BE: Browse Categories
+BE -> DB: Look Up Category
+DB -> BE: Return Products based on Category
+BE -> UI: Display Returned Products
+BE -> RS: Learn from Browse Result
+UI -> SE: Search Product
+SE -> DB: Look For Product
+DB -> SE: Return Relevant Products
+SE -> UI: Display Returned Products
+SE -> RS: Learn from Search Result
+UI -> TPS: Redirect User to Product Purchase
+
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
+
+### User Post or Crawled Data
+
+```puml
+@startuml
+title User Post or Crawled Data
+
+participant "User Interface" as UI
+participant "User Posts" as UP
+participant "Web Crawler" as WC
+participant "Search Engine" as SE
+participant "Browser Engine" as BE
+participant "Database" as DB
+participant "Recommender System" as RS
+participant "Third Party Site" as TPS
+
+UI -> UP: Post Product
+UP -> DB: Store Product Post
+DB -> BE: Update with New Post
+DB -> SE: Update with New Post
+
+WC -> TPS: Crawl Data
+TPS -> WC: Return Found Data
+WC -> DB: Store Crawled Data
+DB -> BE: Update with New Data
+DB -> SE: Update with New Data
+
+BE -> UI: Display Updated Products
+SE -> UI: Display Updated Products
+
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
+
+### Contact Other Users
+
+```puml
+@startuml
+title Contact Other Users
+
+participant "User Interface" as UI
+participant "User Posts" as UP
+participant "Web Crawler" as WC
+participant "Search Engine" as SE
+participant "Browser Engine" as BE
+participant "Database" as DB
+participant "Recommender System" as RS
+participant "Third Party Site" as TPS
+
+UI -> UP: Look up Post
+UI -> UP: Contact Post Author
+UP -> UP: Discuss Price/Payment
+UP -> TPS: Redirect to External Site for Payment
+UP -> RS: Learn from User Activity
+
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
 
 
 # Ex - Component Model: Bottom-Up
