@@ -934,7 +934,7 @@ component BE as "Backend" {
   component BRE as "Browser Engine (Elasticsearch)"
   component WC as "Web Crawler (Scrapy)"
   interface " " as TPSI
-  [Machine Learning (Python)] as ML
+  [Machine Learning (scikit-learn)] as ML
   interface " " as MLI
 }
 
@@ -945,14 +945,14 @@ API -- FEI
 FEI )-- FE
 
 interface " " as BEI
-API - BEI
-BEI )- BE
+API -( BEI
+BEI - BE
 
 FRAPI -- MTI
 MTI )-- MT
 
-UI -( UII
-UII -- FRAPI
+UI - UII
+UII )-- FRAPI
 
 WC -( TPSI
 TPSI - TPS
@@ -973,7 +973,7 @@ RS --( RSI
 RSI -- BAPI
 
 BAPI -- MLI
-MLI -- ML
+MLI )-- ML
 
 skinparam shadowing false
 skinparam defaultFontName Courier
@@ -1007,13 +1007,13 @@ participant "Third Party Site" as TPS
 
 alt Browser Engine
 UI -> API: GET Categories
-API -> BE: Contact Browser Engine
-BE -> BAPI: Contact Database
-BAPI -> DB: Request Categories
+API -> BE: GET /categories/_search
+BE -> BAPI: Query Database
+BAPI -> DB: db.categories.query( { } )
 DB -> BAPI: Return Categories
 BAPI -> BE: Return Categories
 BAPI -> ML: Return Categories
-ML -> ML: Create/Train Model
+ML -> ML: model = sklearn.linear_model.LinearRegression()/model.fit(data)
 ML -> BAPI: Send Trained Model
 BAPI -> RS: Send Trained Model
 BE -> API: Return Categories
@@ -1021,13 +1021,13 @@ API -> UI: POST Categories
 
 else Search Engine
 UI -> API: GET Categories
-API -> SE: Contact Search Engine
-SE -> BAPI: Contact Database
-BAPI -> DB: Request Categories
+API -> SE: GET /products/_search
+SE -> BAPI: Query Database
+BAPI -> DB: db.products.query( { } )
 DB -> BAPI: Return Categories
 BAPI -> SE: Return Categories
 BAPI -> ML: Return Categories
-ML -> ML: Create/Train Model
+ML -> ML: model = sklearn.linear_model.LinearRegression()/model.fit(data)
 ML -> BAPI: Send Trained Model
 BAPI -> RS: Send Trained Model
 SE -> API: Return Categories
@@ -1068,16 +1068,16 @@ participant "Third Party Site" as TPS
 alt User Posts Product
 UI -> FRAPI: POST Product
 UI -> API: POST Product
-API -> DB: Store Product Post
+API -> DB: db.products.insert(product)
 DB -> BAPI: Send Updated Data
 BAPI -> BE: Update with New Post
 BAPI -> SE: Update with New Post
 
 else Crawl Data
-WC -> TPS: Crawl Data
+WC -> TPS: GET Third Party Site URL and crawl
 TPS -> WC: Return Found Data
 WC -> BAPI: Send Crawled Data
-BAPI -> DB: Store Crawled Data
+BAPI -> DB: db.products.insert(data)
 DB -> BAPI: Send Updated Data
 BAPI -> BE: Update with New Data
 BAPI -> SE: Update with New Data
@@ -1128,7 +1128,7 @@ MT -> MT: Discuss Price/Payment
 MT -> TPS: Redirect to External Site for Payment
 UP -> API: Send User Activity
 API -> ML: Send Training Data
-ML -> ML: Train Model
+ML -> ML: model = sklearn.linear_model.LinearRegression()/model.fit(data)
 ML -> BAPI: Send Upgraded Model
 BAPI -> RS: Upgrade Recommender System 
 
@@ -1139,40 +1139,14 @@ skinparam defaultFontName Courier
 @enduml
 ```
 
-## ADR #1: Type of API
+## ADR #1: Crawling Technology
+
+For this architectural decision record, please refer to [the record described here](#adr-2-crawling-technology).
+
+## ADR #2: Training Technology
 Decision Made
 
-  - The API will be RESTful.
-
-Context of the Decision
-
-  - The context of this decision is that the components of the system require to communicate with each other in order to operate properly.
-  
-  - The objective is to allow for components within frontend and backend to contact each other through a global internal API as well as having two smaller APIs specific for the frontend and backend to allow for their inner components to talk without contacting the main one.  
-
-  - This decision will likely affect the architecture in its entirety given that it dictates how the system as a whole will behave when its components interact with each other.
-
-Solved Problem
-
-  - How do we support communication between components?
-
-Alternatives Considered
-
-  - RPC
-  - REST
-
-Choice Made
-
-  - REST
-
-Reason for the Choice
-
-The main advantage over the other type of API that was considered is that most of the components (e.g. Elasticsearch) of the system already operate in a RESTful way over HTTP which should allow for an easier implementation.
-
-## ADR #2: Recommender System Training
-Decision Made
-
-  - The model for the recommender system will be trained on a local machine in the initial stages of release.
+  - The framework to be used to train the recommender system model will be scikit-learn with pandas and NumPy
 
 Context of the Decision
 
@@ -1180,7 +1154,7 @@ Context of the Decision
   
   - The objective is to allow for the training of a model that will suggest products to users reliably and efficiently
 
-  - This decision will not affect much of the architecture, only a subset of the backend will be impacted by this choice.s
+  - This decision will not affect much of the architecture, only a subset of the backend will be impacted by this choice.
 
 Solved Problem
 
@@ -1188,19 +1162,48 @@ Solved Problem
 
 Alternatives Considered
 
-  - Local Machine
-  - AWS Machine Learning
-  - Azure Machine Learning
+  - scikit-learn
+  - TensorFlow
+  - SciPy
 
 Choice Made
 
-  - Local Machine
+  - scikit-learn
 
 Reason for the Choice
 
-This choice will most likely be replaced in future iterations of the project when it will have to scale up but, at an initial stage, the easier idea would involve training a model for the recommender system manually without depending from any other external service.
+The reason behind the choice is mostly due to personal familiarity with the framework as it has been used and covered in university courses. In addition pandas and NumPy will be used as auxiliary tools to manipulate the data to then be used by the model to train itself.
 
-While it would require a powerful machine and an initial expense, for the sake of affordability and resource management, using a local machine to train the model during the first iterations of the system will allow to not spend any more resources on paying for a service that is more powerful but possibly more expensive over time, especially given that the recommender system has been described as an optional feature.
+## ADR #3: Database Technology
+
+Decision Made
+
+- The Database technology will be MongoDB
+
+Context of the Decision
+
+- The context involves storing data that can vary in the information it provides and standardize it to a single format.
+
+- This decision will affect the backend as the database provides information to all the other backend services which will then provide it to the frontend.
+
+Solved Problem
+
+- How can we store the data of products properly?
+
+Alternatives Considered
+
+- MongoDB
+- MySQL
+- Cassandra
+- Neo4j
+
+Choice Made
+
+- MongoDB
+
+Reason for the Choice
+
+The reason behind choosing MongoDB is that, given that products can vary from site to site with possibly missing (or redundant) information and are mostly described in plain text, a documental database would be the best option to store it.
 
 
 # Ex - Interface/API Specification
