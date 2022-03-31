@@ -892,6 +892,316 @@ Exceed: Redesign based on >3 reused components (1 Logical View, >1 Process View,
 
 }
 
+## Logical View
+
+```puml
+@startuml
+skinparam componentStyle rectangle
+
+!include <tupadr3/font-awesome/database>
+
+title Internet Marketplace Logical View
+
+
+component FE as "Frontend (HTML, CSS, JavaScript)" {
+  component FRAPI as "Frontend API (RESTful)"
+  component UI as "User Interface" {
+    component PV as "Product View"
+    component SB as "Search Bar"
+    component CB as "Category Browser"
+    component "User Posts" as UP {
+      component "Non-Product Post" as NPP 
+      component "Product Post" as PP
+    }
+  }
+  [Messaging Tool] as MT
+  interface " " as MTI
+  interface " " as UII
+}
+
+[System API (RESTful)] as API
+
+component BE as "Backend" {
+  component BAPI as "Backend API (RESTful)"
+  component DB as "Database (MongoDB)"
+  interface " " as WCI
+  interface " " as DBI
+  interface " " as SEI
+  interface " " as BREI
+  interface " " as RSI
+  component SE as "Search Engine (Elasticsearch)"
+  component RS as "Recommender System"
+  component BRE as "Browser Engine (Elasticsearch)"
+  component WC as "Web Crawler (Scrapy)"
+  interface " " as TPSI
+  [Machine Learning (Python)] as ML
+  interface " " as MLI
+}
+
+[Third Party Service] as TPS
+
+interface " " as FEI
+API -- FEI
+FEI )-- FE
+
+interface " " as BEI
+API - BEI
+BEI )- BE
+
+FRAPI -- MTI
+MTI )-- MT
+
+UI -( UII
+UII -- FRAPI
+
+WC -( TPSI
+TPSI - TPS
+
+BAPI - WCI
+WCI )- WC
+
+DB - DBI
+DBI )- BAPI
+
+SE --( SEI
+SEI -- BAPI
+
+BAPI -- BREI
+BREI )-- BRE
+
+RS --( RSI
+RSI -- BAPI
+
+BAPI -- MLI
+MLI -- ML
+
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
+
+## Process Views
+
+### User Search and Browse
+
+```puml
+@startuml
+title User Search and Browse
+
+participant "User Interface" as UI
+participant "User Posts" as UP
+participant "Messaging Tool" as MT
+participant "Frontend API" as FRAPI
+
+participant "System API" as API
+
+participant "Web Crawler" as WC
+participant "Search Engine" as SE
+participant "Browser Engine" as BE
+participant "Recommender System" as RS
+participant "Backend API" as BAPI
+participant "Machine Learning" as ML
+participant "Database" as DB
+
+participant "Third Party Site" as TPS
+
+alt Browser Engine
+UI -> API: GET Categories
+API -> BE: Contact Browser Engine
+BE -> BAPI: Contact Database
+BAPI -> DB: Request Categories
+DB -> BAPI: Return Categories
+BAPI -> BE: Return Categories
+BAPI -> ML: Return Categories
+ML -> ML: Create/Train Model
+ML -> BAPI: Send Trained Model
+BAPI -> RS: Send Trained Model
+BE -> API: Return Categories
+API -> UI: POST Categories
+
+else Search Engine
+UI -> API: GET Categories
+API -> SE: Contact Search Engine
+SE -> BAPI: Contact Database
+BAPI -> DB: Request Categories
+DB -> BAPI: Return Categories
+BAPI -> SE: Return Categories
+BAPI -> ML: Return Categories
+ML -> ML: Create/Train Model
+ML -> BAPI: Send Trained Model
+BAPI -> RS: Send Trained Model
+SE -> API: Return Categories
+API -> UI: POST Categories
+end
+
+UI -> TPS: GET Third Party Site Product
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
+
+### User Post or Crawled Data
+
+```puml
+@startuml
+title User Post or Crawled Data
+
+participant "User Interface" as UI
+participant "User Posts" as UP
+participant "Messaging Tool" as MT
+participant "Frontend API" as FRAPI
+
+participant "System API" as API
+
+participant "Web Crawler" as WC
+participant "Search Engine" as SE
+participant "Browser Engine" as BE
+participant "Recommender System" as RS
+participant "Backend API" as BAPI
+participant "Machine Learning" as ML
+participant "Database" as DB
+
+participant "Third Party Site" as TPS
+
+alt User Posts Product
+UI -> FRAPI: POST Product
+UI -> API: POST Product
+API -> DB: Store Product Post
+DB -> BAPI: Send Updated Data
+BAPI -> BE: Update with New Post
+BAPI -> SE: Update with New Post
+
+else Crawl Data
+WC -> TPS: Crawl Data
+TPS -> WC: Return Found Data
+WC -> BAPI: Send Crawled Data
+BAPI -> DB: Store Crawled Data
+DB -> BAPI: Send Updated Data
+BAPI -> BE: Update with New Data
+BAPI -> SE: Update with New Data
+end
+
+BE -> API: Send Updated Search Results
+SE -> API: Send Updated Search Results
+
+API -> UI: POST Updated Products
+
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
+
+### Contact Other Users
+
+```puml
+@startuml
+title Contact Other Users
+
+participant "User Interface" as UI
+participant "User Posts" as UP
+participant "Messaging Tool" as MT
+participant "Frontend API" as FRAPI
+
+participant "System API" as API
+
+participant "Web Crawler" as WC
+participant "Search Engine" as SE
+participant "Browser Engine" as BE
+participant "Recommender System" as RS
+participant "Backend API" as BAPI
+participant "Machine Learning" as ML
+participant "Database" as DB
+
+participant "Third Party Site" as TPS
+
+UI -> FRAPI: Look up Post
+FRAPI -> UP: GET Post
+UP -> FRAPI: Send Post
+FRAPI -> UI: Return Post
+UI -> FRAPI: Send Message
+FRAPI -> MT: Send Message
+MT -> MT: Discuss Price/Payment
+MT -> TPS: Redirect to External Site for Payment
+UP -> API: Send User Activity
+API -> ML: Send Training Data
+ML -> ML: Train Model
+ML -> BAPI: Send Upgraded Model
+BAPI -> RS: Upgrade Recommender System 
+
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
+
+## ADR #1: Type of API
+Decision Made
+
+  - The API will be RESTful.
+
+Context of the Decision
+
+  - The context of this decision is that the components of the system require to communicate with each other in order to operate properly.
+  
+  - The objective is to allow for components within frontend and backend to contact each other through a global internal API as well as having two smaller APIs specific for the frontend and backend to allow for their inner components to talk without contacting the main one.  
+
+  - This decision will likely affect the architecture in its entirety given that it dictates how the system as a whole will behave when its components interact with each other.
+
+Solved Problem
+
+  - How do we support communication between components?
+
+Alternatives Considered
+
+  - RPC
+  - REST
+
+Choice Made
+
+  - REST
+
+Reason for the Choice
+
+The main advantage over the other type of API that was considered is that most of the components (e.g. Elasticsearch) of the system already operate in a RESTful way over HTTP which should allow for an easier implementation.
+
+## ADR #2: Recommender System Training
+Decision Made
+
+  - The model for the recommender system will be trained on a local machine in the initial stages of release.
+
+Context of the Decision
+
+  - The context of this decision involves training a proper recommender system such that users will find useful suggestions related to them when visiting our website.
+  
+  - The objective is to allow for the training of a model that will suggest products to users reliably and efficiently
+
+  - This decision will not affect much of the architecture, only a subset of the backend will be impacted by this choice.s
+
+Solved Problem
+
+  - How do we provide a reliable recommender system?
+
+Alternatives Considered
+
+  - Local Machine
+  - AWS Machine Learning
+  - Azure Machine Learning
+
+Choice Made
+
+  - Local Machine
+
+Reason for the Choice
+
+This choice will most likely be replaced in future iterations of the project when it will have to scale up but, at an initial stage, the easier idea would involve training a model for the recommender system manually without depending from any other external service.
+
+While it would require a powerful machine and an initial expense, for the sake of affordability and resource management, using a local machine to train the model during the first iterations of the system will allow to not spend any more resources on paying for a service that is more powerful but possibly more expensive over time, especially given that the recommender system has been described as an optional feature.
+
 
 # Ex - Interface/API Specification
 
