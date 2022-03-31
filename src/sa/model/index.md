@@ -1205,6 +1205,10 @@ Reason for the Choice
 
 The reason behind choosing MongoDB is that, given that products can vary from site to site with possibly missing (or redundant) information and are mostly described in plain text, a documental database would be the best option to store it.
 
+## ADR #4: Search Technology
+
+For this architectural decision record, please refer to [the record described here](#adr-3-search-technology).
+
 
 # Ex - Interface/API Specification
 
