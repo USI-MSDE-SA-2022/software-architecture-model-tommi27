@@ -1238,6 +1238,8 @@ Exceed: Also, document the Web API using the OpenAPI language. You can use the [
 
 }
 
+In order to design the interface, the top-down model was used.
+
 ### Interface Specification
 
 ![Interface](./interface.puml)
