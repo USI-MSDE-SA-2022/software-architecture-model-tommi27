@@ -10,7 +10,7 @@ post(userPost)
 --
 events:
 ..
-post
+userCreatesPost
 ==
 requires:
 --
@@ -20,6 +20,7 @@ getPostById(id)
 storePost(post)
 search(keywords)
 search(categories)
+postModel(model)
 --
 properties:
 ..
@@ -165,6 +166,7 @@ class "Recommender System" {
     ..
     create(model)
     train(model)
+    postModel(model)
     --
     events:
     ..
@@ -207,6 +209,7 @@ class "Web API" {
     storePost(post)
     search(keywords)
     search(categories)
+    postModel(model)
     ==
     provides:
     --
@@ -218,7 +221,8 @@ class "Web API" {
 "User Interface" -(0- "Web API"
 "Web API" -(0- "Search Engine"
 "Web API" -(0- "Browser Engine"
-"Web API" -(0- "Database"
+"Web API" -(0- Database
+"Web API" -(0- "Recommender System"
 "Web Crawler Manager" --(0- Database
 "Web Crawler Manager" -0)- "Partnered Site Crawler"
 "Search Engine" -(0- Database
