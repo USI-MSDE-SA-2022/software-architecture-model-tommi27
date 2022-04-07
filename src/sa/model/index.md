@@ -1238,6 +1238,14 @@ Exceed: Also, document the Web API using the OpenAPI language. You can use the [
 
 }
 
+### Interface Specification
+
+![Interface](./interface.puml)
+
+### Open API Tree
+
+![Open API Tree Picture](../../../src/sa/model/apiTree.png)
+
 # Ex - Connector View
 
 {.instructions
