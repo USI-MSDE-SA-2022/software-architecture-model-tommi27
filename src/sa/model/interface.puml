@@ -16,6 +16,7 @@ requires:
 --
 operations:
 ..
+getPostById(id)
 storePost(post)
 search(keywords)
 search(categories)
@@ -79,12 +80,12 @@ queryStart
 queryEnd
 }
 
-class "Web Crawler" {
+class "Web Crawler Manager" {
 provides:
 --
 operations:
 ..
-crawl(data)
+manage(crawlers)
 --
 properties:
 ..
@@ -113,6 +114,7 @@ operations:
 queryDB(query)
 storeData(data)
 storePost(post)
+getPostById(id)
 --
 events:
 ..
@@ -172,17 +174,28 @@ class "Recommender System" {
     trainEnd
 }
 
-class "Third Party Site" {
+class "Partnered Site Crawler" {
     provides:
     --
     operations:
     ..
     existData()
+    crawl(partneredSiteURL, speed)
     --
     events:
     ..
     crawlStart
     crawlEnd
+    ==
+    requires:
+    --
+    operations:
+    ..
+    manage(crawlers)
+    --
+    properties:
+    ..
+    crawlSpeed
 }
 
 class "Web API" {
@@ -190,6 +203,7 @@ class "Web API" {
     --
     operations:
     ..
+    getPostById(id)
     storePost(post)
     search(keywords)
     search(categories)
@@ -205,8 +219,8 @@ class "Web API" {
 "Web API" -(0- "Search Engine"
 "Web API" -(0- "Browser Engine"
 "Web API" -(0- "Database"
-"Web Crawler" --(0- Database
-"Web Crawler" -(0- "Third Party Site"
+"Web Crawler Manager" --(0- Database
+"Web Crawler Manager" -0)- "Partnered Site Crawler"
 "Search Engine" -(0- Database
 "Browser Engine" -(0- Database
 "Messaging Tool" --(0- "User Interface"
