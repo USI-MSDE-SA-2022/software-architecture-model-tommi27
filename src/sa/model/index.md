@@ -1258,6 +1258,8 @@ For every pair of connected components (logical view), pick the most suitable co
 
 Make sure that the interactions shown in the process views reflect the primitives of the selected connector
 
+![Example Connector View Diagram](./examples/connector-view.c5)
+
 Pass: model existing connectors based on previous model decisions
 
 Good: model existing connectors based on previous model decisions, write an ADR about the choice of one connector
@@ -1266,6 +1268,37 @@ Exceed: introduce a new type of connector and update your existing process view
 (sequence diagram) to show the connector primitives in action
 
 }
+
+![Connector View](./connector.c5)
+
+## Architectural Decision Record
+
+### Decision Made
+
+- The frontend and the backend will interact via a connector modeled as a Web API.
+
+### Context of the Decision
+
+ - The context of the decision stems from the fact that the various components of the system will have to interact with each other and we need to find a viable option to make that happen.
+
+- Given the requirements, the choice will impact the architecture on a large scale but it won't impact the smaller components themselves, only the way that they interact with each other.
+
+### Solved Problem
+
+- How can the components communicate with each other?
+
+###  Alternatives Considered
+
+- Web API
+- Specific sets of instructions per component
+
+### Choice Made
+
+- Web API
+
+### Reason for the Choice
+
+- The choice of the Web API seems like the better one as it allows for a standard way of communication between the various components of the system. Having ad hoc sets of instructions to send information between all the components would introduce a level of complexity that is just unnecessary.
 
 # Ex - Adapters and Coupling
 
