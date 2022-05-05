@@ -10,4 +10,4 @@ Web Crawler -file-> db Database
 Search/Browser Engines -queue-> Recommender System
 Recommender System -call-> db Database
 
-Web Crawler -call-> Third Party Service
+Web Crawler -call-> web Site API -call-> Third Party Service

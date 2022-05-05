@@ -1290,7 +1290,7 @@ Exceed: introduce a new type of connector and update your existing process view
 ###  Alternatives Considered
 
 - Web API
-- Specific sets of instructions per component
+- RPC
 
 ### Choice Made
 
@@ -1336,6 +1336,273 @@ Whenever you have a connector you couple together the components and different c
   Regarding the coupling facets mentioned in question 5. You do not have to answer all questions related to "discovery", "session", "binding", "interaction", "timing", "interface" and "platform" (p.441, Coupling Facets). Just the ones that you think are relevant for your design and by answering them you can get ideas on how to do question 6.
 
 }
+
+## Identified Adapters
+
+The adapters that we identify in the main architecture are: the Web API that allows for communication between frontend and backend and the possible existing Web APIs that we could interact with when crawling or requesting data from a website.
+
+We highlight them in green as follows:
+
+```puml
+@startuml
+skinparam componentStyle rectangle
+
+!include <tupadr3/font-awesome/database>
+
+title Internet Marketplace Logical View
+
+
+component FE as "Frontend (HTML, CSS, JavaScript)" {
+  component FRAPI as "Frontend API (RESTful)"
+  component UI as "User Interface" {
+    component PV as "Product View"
+    component SB as "Search Bar"
+    component CB as "Category Browser"
+    component "User Posts" as UP {
+      component "Non-Product Post" as NPP 
+      component "Product Post" as PP
+    }
+  }
+  [Messaging Tool] as MT
+  interface " " as MTI
+  interface " " as UII
+}
+
+[System API (RESTful)] as API #Green
+
+component BE as "Backend" {
+  component BAPI as "Backend API (RESTful)"
+  component DB as "Database (MongoDB)"
+  interface " " as WCI
+  interface " " as DBI
+  interface " " as SEI
+  interface " " as BREI
+  interface " " as RSI
+  component SE as "Search Engine (Elasticsearch)"
+  component RS as "Recommender System"
+  component BRE as "Browser Engine (Elasticsearch)"
+  component WC as "Web Crawler (Scrapy)"
+  interface " " as TPSI
+  [Machine Learning (scikit-learn)] as ML
+  interface " " as MLI
+}
+
+[Third Party Service] as TPS
+[Third Party API] as TAPI #Green
+interface " " as TAPII
+
+interface " " as FEI
+API -- FEI
+FEI )-- FE
+
+interface " " as BEI
+API -( BEI
+BEI - BE
+
+FRAPI -- MTI
+MTI )-- MT
+
+UI - UII
+UII )-- FRAPI
+
+WC -( TPSI
+TPSI - TAPI
+
+BAPI - WCI
+WCI )- WC
+
+DB - DBI
+DBI )- BAPI
+
+SE --( SEI
+SEI -- BAPI
+
+BAPI -- BREI
+BREI )-- BRE
+
+RS --( RSI
+RSI -- BAPI
+
+BAPI -- MLI
+MLI )-- ML
+
+TAPI -( TAPII
+TAPII - TPS
+
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
+
+## Solved Mismatches
+
+The mismatches solved by both APIs are similar in nature. The frontend/backend API takes care of forwarding HTTP requests back and forth in order to allow for local execution of instructions while, in case a website provides an API for crawling or for requesting data, that would solve the mismatch of having to crawl manually through CSS selectors and would simplify the process via forwarding of HTTP requests.
+
+## Introduced Wrappers
+
+```puml
+@startuml
+skinparam componentStyle rectangle
+
+!include <tupadr3/font-awesome/database>
+
+title Internet Marketplace Logical View
+
+component FE as "Frontend (HTML, CSS, JavaScript)" {
+  component FRAPI as "Frontend API (RESTful)"
+  component UI as "User Interface" {
+    component PV as "Product View"
+    component SB as "Search Bar"
+    component CB as "Category Browser"
+    component "User Posts" as UP {
+      component "Non-Product Post" as NPP 
+      component "Product Post" as PP
+    }
+  }
+  [Messaging Tool] as MT
+  interface " " as MTI
+  interface " " as UII
+}
+
+component "Backend Wrapper" {
+  [System API (RESTful)] as API
+  interface " " as BEI
+
+  component BE as "Backend" {
+    component BAPI as "Backend API (RESTful)"
+    component DB as "Database (MongoDB)"
+    interface " " as WCI
+    interface " " as DBI
+    interface " " as SEI
+    interface " " as BREI
+    interface " " as RSI
+    component SE as "Search Engine (Elasticsearch)"
+    component RS as "Recommender System"
+    component BRE as "Browser Engine (Elasticsearch)"
+    component WC as "Web Crawler (Scrapy)"
+    interface " " as TPSI
+    [Machine Learning (scikit-learn)] as ML
+    interface " " as MLI
+  }
+}
+
+component "Crawl Wrapper" {
+
+  [Third Party Service] as TPS
+
+  [Third Party API] as TAPI
+  interface " " as TAPII
+
+}
+
+interface " " as FEI
+API -- FEI
+FEI )-- FE
+
+API -( BEI
+BEI - BE
+
+FRAPI -- MTI
+MTI )-- MT
+
+UI - UII
+UII )-- FRAPI
+
+WC -( TPSI
+TPSI -- TAPI
+
+BAPI - WCI
+WCI )- WC
+
+DB - DBI
+DBI )- BAPI
+
+SE --( SEI
+SEI -- BAPI
+
+BAPI -- BREI
+BREI )-- BRE
+
+RS --( RSI
+RSI -- BAPI
+
+BAPI -- MLI
+MLI )-- ML
+
+TAPI -( TAPII
+TAPII - TPS
+
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
+
+## Standard Interfaces
+
+Given the two adapters that we identified, we can say that the main web API that allows communication between frontend and backend is not a standard as it is an _ad hoc_ interface that we have made for our system. The potentially existing API(s) that connect to other websites would instead be a standard as, by utilizing them and connecting to them, we would be making them a _de facto_ standard. Additionally, they could already be a widely used interface and a standard.
+
+## Coupling Facets
+
+We examine the frontend component with coupling facets as follows:
+
+- The frontend is actually not aware of the components it talks to, it sends requests to the API that then takes care of connecting to the backend to return what is needed. Therefore, discovery is automatic.
+  
+- The frontend shares a session with the API and, while code may execute asynchronously with other sessions, the client and the API are required to be up and running at the same time.
+
+- The API should be able to whitstand change as it is a flexible RESTful API. Removing features would be something hard to take into account but that inherently depends on the fact that feature removal is harder than adding new ones.
+
+- Interactions between frontend and backend are completely indirect as they must go through the main API first.
+
+- The API selects the component at design-time as it is designed to select components for the frontend to talk to. Therefore, we have early-binding.
+
+- The platform should not have any impact on the frontend or the API as the frontend is a web-based component and the API is not platform dependant as it works over HTTP.
+
+## Pseudo-Code
+
+### Web API Adapter
+
+```
+  Post getPostById(id) {
+    Post p = query db for post with id
+    return p
+  }
+
+  void storePost(post) {
+    uuid = generate new unique identifier
+    store post into db
+  }
+
+  Products[] search(keywords) {
+    match keywords and return products through elasticsearch
+  }
+
+  Products[] search(categories) {
+    match categories and filter products through elastic
+  }
+
+  void postModel(model) {
+    send model to recommender system
+  }
+```
+
+### Third Party Website API
+
+Please, not that these APIs may not exist for all websites, they are hypothetically described with features that we would use if available.
+
+```
+  Document getDocumentById(id) {
+    return document with id
+  }
+
+  Document[] getDocumentsByCategory(categoryId) {
+    return documents that match the category via the API if it exists
+  }
+
+  Document[] getDocumentsByKeywords(keywords) {
+    return documents that match the given keywords
+  }
+
+```
 
 # Ex - Physical and Deployment Views
 
