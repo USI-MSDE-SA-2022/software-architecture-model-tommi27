@@ -1433,7 +1433,9 @@ skinparam shadowing false
 skinparam defaultFontName Courier
 @enduml
 ```
-
+```
+Is the scrapy component able to interact with third party APIs?
+```
 ## Solved Mismatches
 
 The mismatches solved by both APIs are similar in nature. The frontend/backend API takes care of forwarding HTTP requests back and forth in order to allow for local execution of instructions while, in case a website provides an API for crawling or for requesting data, that would solve the mismatch of having to crawl manually through CSS selectors and would simplify the process via forwarding of HTTP requests.
@@ -1537,10 +1539,15 @@ skinparam defaultFontName Courier
 @enduml
 ```
 
+```
+Is the crawl wrapper able to send HTML output to the scrapy component?
+```
 ## Standard Interfaces
 
 Given the two adapters that we identified, we can say that the main web API that allows communication between frontend and backend is not a standard as it is an _ad hoc_ interface that we have made for our system. The potentially existing API(s) that connect to other websites would instead be a standard as, by utilizing them and connecting to them, we would be making them a _de facto_ standard. Additionally, they could already be a widely used interface and a standard.
-
+```
+Can frontend and backend exchange information using standards such as JSON or XML?
+```
 ## Coupling Facets
 
 We examine the frontend component with coupling facets as follows:
