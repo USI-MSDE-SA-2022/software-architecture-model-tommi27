@@ -1705,6 +1705,161 @@ Exceed: 1, 2, 3, 4, 5, 6, 7, 8
 
 }
 
+### 1. Server Hosting
+
+The software would already run on a server.
+
+### 2. Service Pricing Model
+
+The software would be free, the purpose of this application is not to sell services. The website aims to survive via donations and advertisements.
+
+### 3. Availability Requirements
+
+Given the free nature of the project, we do not expect to guarantee extremely high availability standards but we also do not aim to do the bare minimum. Regarding planned downtimes, we expect the service to not be down for long. In order to warn users about expected downtimes, we could add model a `div` signaling an expected downtime for maintenance that would last from 15 to 30 minutes on a specific date.
+
+As for unplanned downtimes, they would certainly prove damaging to us as we rely on users to view advertisements or donate meaning that, if our services are down, we cannot have any users. The duration of such downtimes is not predictable but we hope to minimize it.
+
+The expected response time should be within 500ms and 3s. Any user would be loading up a webpage, our service should be responsive by using Elasticsearch for search functionalities and by having a lightweight UI but, taking latency into account, a couple of seconds is to be expected and I believe it to be a common thing across the web for websites to take a moment to load so it should not impact the experience of a user too drastically.
+
+### 4. Availability Monitoring
+
+#### Logical View
+
+```puml
+@startuml
+skinparam componentStyle rectangle
+
+!include <tupadr3/font-awesome/database>
+
+title Internet Marketplace Logical View
+
+component WD as "Watchdog"
+interface " " as WDI
+
+component FE as "Frontend (HTML, CSS, JavaScript)" {
+  component FRAPI as "Frontend API (RESTful)"
+  component UI as "User Interface" {
+    component PV as "Product View"
+    component SB as "Search Bar"
+    component CB as "Category Browser"
+    component "User Posts" as UP {
+      component "Non-Product Post" as NPP 
+      component "Product Post" as PP
+    }
+  }
+  [Messaging Tool] as MT
+  interface " " as MTI
+  interface " " as UII
+}
+
+[System API (RESTful)] as API
+
+component BE as "Backend" {
+  component BAPI as "Backend API (RESTful)"
+  component DB as "Database (MongoDB)"
+  interface " " as WCI
+  interface " " as DBI
+  interface " " as SEI
+  interface " " as BREI
+  interface " " as RSI
+  component SE as "Search Engine (Elasticsearch)"
+  component RS as "Recommender System"
+  component BRE as "Browser Engine (Elasticsearch)"
+  component WC as "Web Crawler (Scrapy)"
+  interface " " as TPSI
+  [Machine Learning (scikit-learn)] as ML
+  interface " " as MLI
+}
+
+[Third Party Service] as TPS
+
+interface " " as FEI
+API -- FEI
+FEI )-- FE
+
+interface " " as BEI
+API -( BEI
+BEI - BE
+
+FRAPI -- MTI
+MTI )-- MT
+
+UI - UII
+UII )-- FRAPI
+
+WC -( TPSI
+TPSI - TPS
+
+BAPI - WCI
+WCI )- WC
+
+DB - DBI
+DBI )- BAPI
+
+SE --( SEI
+SEI -- BAPI
+
+BAPI -- BREI
+BREI )-- BRE
+
+RS --( RSI
+RSI -- BAPI
+
+BAPI -- MLI
+MLI )-- ML
+
+WD -( WDI
+WDI - API
+
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
+
+#### ADR: Availability Monitoring Strategy
+Decision Made
+
+  - The availability of the system will be monitored via a watchdog.
+
+Context of the Decision
+
+  - We need to have a way to monitor the availability of the system.
+
+Solved Problem
+
+  - How can we monitor the system without overloading it?
+
+Alternatives Considered
+
+  - Watchdog
+  - Heartbeat
+
+Choices Made
+
+  - Watchdog
+
+Reason for the Choice
+
+  - We choose a watchdog as it is the simplest way to check for availability and it would only add up as just another periodic request. Given that our system should handle a large amount of requests, one more request from the watchdog should not add any significant overhead and will be simpler than a heartbeat approach.
+
+### 7. Cascading Failures
+
+ In our architecture, not all components would cause cascading failures ending up with the entire system down. In particular, the database and the API are the components that could cause the entire system to crash.
+
+ If the database were to stop working for any reason, there would be no way of getting data to display to users and, therefore, the system would stop being available while, if the API were to go down, the same issue would present itself but under another aspect. The frontend would not able to talk to the backend anymore and we would not be able to get data rendering the system unable to provide users with what they need.
+
+ One could make an argument that if the engines were to crash, then users would not be able to narrow their search for what they look for but, regardless of that, the entire data could still be requested without providing any filters. As expensive as it is, it could be a last resort to avoid crashing in case of both engines failing at the same time.
+
+ The other components such as the crawler, the third party sites, the recommender system and the messaging tool should not compromise the entire system. They may render some of the features unavailable for a period of time but they will not cause the entire application to fail as they take care of keeping the data fresh, posting an additional way of finding products and a way to contact other registered users.
+
+ A way to avoid cascading failures would be to replicate the core components onto other backup machines that would handle the requests should the main system fail. Unfortunately, if the main components were to crash on even the backup machines, then failure cannot really be avoided.
+
+### 8. External Dependency Availability
+
+Our main external dependency depends on the third party sites that we would have to crawl. Naturally, if their system were to be down for any reason when we crawl them, we would lose data for that crawling instance which, as stated in the previous iterations of this assignment, will not happen again for another 24 to 48 hours or possibly more depending on what the third party allows us.
+
+In order to mitigate this, we could make an accord with the external company owning the site to allow for "extraordinary" crawling in case of downtime or we could rely on the most recent crawled data which, sometimes, may not fully reflect real product availability.
+
 # Ex - Scalability
 
 {.instructions 

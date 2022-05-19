@@ -21,13 +21,14 @@ database Database as DB
 rectangle "Third Party Seller" as TPS
 rectangle Crawler
 
-UI - API: HTTP/FTP
-API - DB: HTTP
-API - Engines: HTTP
-API -- RS: HTTP
-Engines - DB: HTTP
-DB - Crawler: HTTP
-Engines - RS: FTP
-Crawler - TPS: HTTP
+UI -> API: HTTP
+UI <- API: FTP
+API -> DB: HTTP
+API <-> Engines: HTTP
+API <-- RS: HTTP
+Engines -> DB: HTTP
+DB <- Crawler: HTTP
+Engines -> RS: FTP
+Crawler -> TPS: HTTP
 
 @enduml
