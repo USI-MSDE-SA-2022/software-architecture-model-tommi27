@@ -1648,6 +1648,12 @@ Exceed: 1 physical view, 1 deployment view, 1 ADR (b.) + 1 demo (c.)
 
 ![Deployment View](./deployment.puml)
 
+{.feedback
+
+A deployment view should describe where each logical component is going to be deployed. This view looks more like a Physical View as it does not appear to contain any logical component.
+
+}
+
 ## ADR: Deployment Strategy
 Decision Made
 
