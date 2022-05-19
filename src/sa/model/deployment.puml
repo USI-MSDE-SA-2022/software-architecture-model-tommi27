@@ -1,0 +1,33 @@
+@startuml
+!include <C4/C4_Container>
+
+rectangle UI [
+User Interface
+--
+User Posts
+]
+
+rectangle Engines [
+Search Engine
+--
+Browser Engine
+]
+
+rectangle "Recommender System" as RS
+
+usecase "Web API" as API
+database Database as DB
+
+rectangle "Third Party Seller" as TPS
+rectangle Crawler
+
+UI - API: HTTP/FTP
+API - DB: HTTP
+API - Engines: HTTP
+API -- RS: HTTP
+Engines - DB: HTTP
+DB - Crawler: HTTP
+Engines - RS: FTP
+Crawler - TPS: HTTP
+
+@enduml

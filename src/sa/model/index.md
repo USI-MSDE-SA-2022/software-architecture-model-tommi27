@@ -1640,6 +1640,48 @@ Exceed: 1 physical view, 1 deployment view, 1 ADR (b.) + 1 demo (c.)
 
 }
 
+## Container View
+
+![Container View](./container.puml)
+
+## Deployment View
+
+![Deployment View](./deployment.puml)
+
+## ADR: Deployment Strategy
+Decision Made
+
+  - The frontend part of the system will be deployed based on A/B Testing while the backend will be deployed using a Blue/Green strategy.
+
+Context of the Decision
+
+  - The context of the decision involves maximizing the availability of the system without sacrificing performance.
+
+Solved Problem
+
+  - How can we allow deployment without destroying everything?
+
+Alternatives Considered
+
+  - Big Bang
+  - Blue/Green
+  - Shadow
+  - Pilot
+  - Gradual Phase-in
+  - Canary
+  - A/B Testing
+
+Choices Made
+
+  - A/B Testing (Frontend)
+  - Blue/Green (Backend)
+
+Reason for the Choice
+
+We choose A/B Testing for the frontend as, really, the UI will be affected by this type of deployment. This is already employed by many large companies such as YouTube. Sometimes you may notice something slightly different on your web interface and the next time you use the site it is gone or replaced by something else. Therefore, releasing small changes to the UI to different small subsets of users and seeing the reactions looks like a great option to keep the interface up to date.
+
+Instead, we choose Blue/Green for the backend as we want to deploy our changes to actual meaningful features that will impact performance and availability and we want to be able to revert to a stable version in case the newer one unexpectedly fails or crashes.
+
 # Ex - Availability and Services
 
 {.instructions 
