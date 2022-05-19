@@ -16,7 +16,7 @@ jobs:
       with:
         node-version: 14
     - name: Build
-      run: yarn build
+      run: yarn install && yarn build
     - name: Deploy website
       if: success()
       uses: JamesIves/github-pages-deploy-action@releases/v3
