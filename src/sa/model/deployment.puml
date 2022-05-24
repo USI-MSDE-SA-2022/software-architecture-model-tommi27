@@ -35,4 +35,33 @@ Engines -> RS: FTP
 Crawler -> TPS: HTTP
 }
 
+Person(user_c, "Customer", "")
+Person(user_s, "Seller", "User as Seller")
+
+System_Boundary(boundary, "Internet Marketplace") {
+    Container(website, "Website", "HTML, CSS, light JavaScript" ,"Display Data and Provide Search Features")
+    Container(search_engine, "Search/Browser Engine", "Elasticsearch", "Perform Search")
+    Container(crawler, "Web Crawler", "Python", "Crawl Data")
+    Container(db, "Database", "MongoDB", "Store Crawled Data")
+    Container(rec_sys, "Recommender System", "Python", "Train Classifier for Suggestions")
+    Container(API, "API", "RESTful")
+}
+
+System_Ext(third_party, "Third Party Seller")
+System_Ext(third_party_transaction, "Third Party Transaction Service")
+
+Rel(user_c, website, "Look Up Products")
+Rel(user_s, website, "Post Own Products")
+Rel(website, third_party, "Redirect To", "Purchasable Product on Third Party Site")
+Rel(crawler, third_party, "Crawl", "Product Data")
+Rel(crawler, db, "Store Data")
+Rel(search_engine, db, "Read Data")
+Rel(website, API, "Send Keywords/Categories Selected by User")
+Rel(API, search_engine, "Get Data to Display")
+Rel(website, third_party_transaction, "Redirect Users to External Transaction Service", "User-Generated Posts")
+Rel(search_engine, rec_sys, "Send Engine Results")
+Rel(rec_sys, API, "Send Model for Suggestions after Training")
+Rel(API, website, "Send Model for Suggestions after Training")
+Rel(website, API, "Send User Posts to DB")
+Rel(API, db, "Store User Posts")
 @enduml
