@@ -1,12 +1,15 @@
 @startuml
 !include <C4/C4_Container>
 
+System_Boundary(b, "Web Browser") {
 rectangle UI [
 User Interface
 --
 User Posts
 ]
+}
 
+System_Boundary(c, "System Servers") {
 rectangle Engines [
 Search Engine
 --
@@ -30,5 +33,6 @@ Engines -> DB: HTTP
 DB <- Crawler: HTTP
 Engines -> RS: FTP
 Crawler -> TPS: HTTP
+}
 
 @enduml
