@@ -1,0 +1,34 @@
+@startuml
+!include <C4/C4_Container>
+
+System_Boundary(boundary, "Internet Marketplace") {
+    System_Boundary(fr, "Frontend Server(s)") {
+        Container(website, "Website", "HTML, CSS, light JavaScript" ,"Display Data and Provide Search Features")
+    }
+
+    System_Boundary(be, "Backend Servers") {
+        System_Boundary(dm, "DB Servers") {
+            Container(db, "Database", "MongoDB", "Store Crawled Data")
+        }
+        Container(API, "API", "RESTful")
+        System_Boundary(es, "Engine/Training Servers") {
+            Container(search_engine, "Search/Browser Engine", "Elasticsearch", "Perform Search")
+            Container(crawler, "Web Crawler", "Python", "Crawl Data")
+            Container(rec_sys, "Recommender System", "Python", "Train Classifier for Suggestions")
+        }
+    }
+}
+
+System_Ext(third_party, "Third Party Seller")
+
+Rel(website, API, "HTTP")
+Rel(API, website, "FTP")
+Rel(API, db, "HTTP")
+Rel(API, search_engine, "HTTP")
+Rel(search_engine, API, "HTTP")
+Rel(rec_sys, API, "HTTP")
+Rel(search_engine, db, "HTTP")
+Rel(crawler, db, "HTTP")
+Rel(search_engine, rec_sys, "FTP")
+Rel(crawler, third_party, "HTTP")
+@enduml

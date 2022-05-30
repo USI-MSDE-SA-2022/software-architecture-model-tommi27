@@ -1890,6 +1890,238 @@ Exceed: 1, 2, 3, 4, 5 then redo 1, 2, 3 for different scalability dimensions
 
 }
 
+## 1. Scalability Dimension
+
+The scalability dimension that we choose the number of clients. This is probably the most relevant dimension that concerns our project. Given that the project will be a website that aims to handle a large number of requests from many users, this is the dimension that we expect to deal with the most.
+
+## 2. Bottleneck
+
+The whole frontend including the API should be lightweight and Elasticsearch was chosen precisely because it supports text search over large quantities of data. We expect the bottleneck to be in the fact that the database is currently running on a single machine meaning that there is a chance that a growing number of requests may overload such machine.
+
+## 3. Updated Views
+
+### Logical View
+
+```puml
+@startuml
+skinparam componentStyle rectangle
+
+!include <tupadr3/font-awesome/database>
+
+title Internet Marketplace Logical View
+
+
+component FE as "Frontend (HTML, CSS, JavaScript)" {
+  component FRAPI as "Frontend API (RESTful)"
+  component UI as "User Interface" {
+    component PV as "Product View"
+    component SB as "Search Bar"
+    component CB as "Category Browser"
+    component "User Posts" as UP {
+      component "Non-Product Post" as NPP 
+      component "Product Post" as PP
+    }
+  }
+  [Messaging Tool] as MT
+  interface " " as MTI
+  interface " " as UII
+}
+
+[System API (RESTful)] as API
+interface " " as LBI
+[Request Load Balancer] as LB
+ 
+component BE as "Backend" {
+  component BAPI as "Backend API (RESTful)"
+  component DB as "Database Over Multiple Machines (MongoDB)"
+  interface " " as WCI
+  interface " " as DBI
+  interface " " as SEI
+  interface " " as BREI
+  interface " " as RSI
+  component SE as "Search Engine (Elasticsearch)"
+  component RS as "Recommender System"
+  component BRE as "Browser Engine (Elasticsearch)"
+  component WC as "Web Crawler (Scrapy)"
+  interface " " as TPSI
+  [Machine Learning (scikit-learn)] as ML
+  interface " " as MLI
+}
+
+[Third Party Service] as TPS
+
+interface " " as FEI
+API -- FEI
+FEI )-- FE
+
+interface " " as BEI
+API -( LBI
+LBI - LB
+LB -( BEI
+BEI - BE
+
+FRAPI -- MTI
+MTI )-- MT
+
+UI - UII
+UII )-- FRAPI
+
+WC -( TPSI
+TPSI - TPS
+
+BAPI - WCI
+WCI )- WC
+
+DB - DBI
+DBI )- BAPI
+
+SE --( SEI
+SEI -- BAPI
+
+BAPI -- BREI
+BREI )-- BRE
+
+RS --( RSI
+RSI -- BAPI
+
+BAPI -- MLI
+MLI )-- ML
+
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
+
+### Process View
+
+```puml
+@startuml
+title User Search and Browse
+
+participant "User Interface" as UI
+participant "User Posts" as UP
+participant "Messaging Tool" as MT
+participant "Frontend API" as FRAPI
+
+participant "System API" as API
+participant "Load Balancer" as LB
+participant "Worker A" as WA
+participant "Worker B" as WB
+
+participant "Web Crawler" as WC
+participant "Search Engine" as SE
+participant "Browser Engine" as BE
+participant "Recommender System" as RS
+participant "Backend API" as BAPI
+participant "Machine Learning" as ML
+participant "Databases" as DB
+
+participant "Third Party Site" as TPS
+
+alt Browser Engine
+UI -> API: GET Categories
+API -> LB: Assign to Worker A
+LB -> WA
+WA -> BE: GET /categories/_search
+BE -> BAPI: Query a Database
+BAPI -> DB: db.categories.query( { } )
+DB -> BAPI: Return Categories
+BAPI -> BE: Return Categories
+BAPI -> ML: Return Categories
+ML -> ML: model = sklearn.linear_model.LinearRegression()/model.fit(data)
+ML -> BAPI: Send Trained Model
+BAPI -> RS: Send Trained Model
+BE -> WA: Return Categories
+WA -> LB: Return Categories
+LB -> API: Return Categories
+API -> UI: POST Categories
+
+else Search Engine
+UI -> API: GET Categories
+API -> LB: Assign to Worker B
+LB -> WB
+WB -> SE: GET /products/_search
+SE -> BAPI: Query a Database
+BAPI -> DB: db.products.query( { } )
+DB -> BAPI: Return Categories
+BAPI -> SE: Return Categories
+BAPI -> ML: Return Categories
+ML -> ML: model = sklearn.linear_model.LinearRegression()/model.fit(data)
+ML -> BAPI: Send Trained Model
+BAPI -> RS: Send Trained Model
+SE -> WB: Return Categories
+WB -> LB: Return Categories
+LB -> API: Return Categories
+API -> UI: POST Categories
+end
+
+UI -> TPS: GET Third Party Site Product
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
+
+### Deployment View
+
+![Deployment View](./deployment_scalability.puml)
+
+## 4. ADR: Scalability Pattern
+
+Decision Made
+
+  - The scalability pattern introduced will be a load balancer.
+
+Context of the Decision
+
+  - The context is that we need to apply a pattern in order to guarantee scalability with the number of requests received.
+
+Solved Problem
+
+  - How can we scale up in terms of number of clients?
+
+Alternatives Considered
+
+  - Load Balancing
+  - Master/Worker
+  - Sharding
+
+Choice Made
+
+  - Load Balancing
+
+Reason for the Choice
+
+  - Among the considered patterns, load balancing is the only one that truly addresses the issue of a growing amount of clients. Master/Worker and sharding would probably not be as useful to face the problem as they  allow us to work with larger data in different ways. The former works best when handling a large chunk of data while the latter increases storage capacity. Unfortunately, we do not plan on increasing our capacity largely as we refresh the data that we acquire from partnered sites throwing away older entries and requests will never be more complicated than a few keywords or categories so we will not need to compute large amounts of data. Therefore, a load balancer is the perfect fit for our issue.
+
+## 5. ADR: Component Discovery
+
+Decision Made
+
+  - The way to discover components will be via a Directory.
+
+Context of the Decision
+
+  - The context is that we need to finda a way to allow dynamic component discovery.
+
+Solved Problem
+
+  - How do we allow component discovery?
+
+Alternatives Considered
+
+  - Directory
+  - Dependency Injection
+
+Choice Made
+
+  - Directory
+
+Reason for the Choice
+
+  - Given our choice of a load balancer in order to handle growing requests, we need to implement a Directory to support it. The load balancer requires to assign work to available workers and the Directory can allow that since it holds interface endpoints via a description. We can have the endpoints of available workers registered on the Directory that will then allow the other components to find the workers to assign the work to.
+
 # Ex - Flexibility
 
 {.instructions 
