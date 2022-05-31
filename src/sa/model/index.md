@@ -2480,9 +2480,9 @@ class ThirdPartySite {
   public checkAvailability() {
     // prioritize API over anything else if it exists
     if (hasApi) {
-      crawlWithApi(siteName)
+      Crawler.crawlWithApi(siteName)
     } else if (hasCss) {
-      crawlWithCss(siteName)
+      Crawler.crawlWithCss(siteName)
     } else {
       // signal that crawler needs to be rewritten
     }
