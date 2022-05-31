@@ -1,0 +1,13 @@
+User Interface -call-> web Web API -call-> Search/Browser Engines -call-> db Database
+
+User Interface -call-> Messaging Tool
+Recommender System -queue-> web Web API
+
+web Web API -file-> db Database
+
+Web Crawler -file-> db Database
+
+Search/Browser Engines -queue-> Recommender System
+Recommender System -call-> db Database
+
+Web Crawler -call-> web Site API -call-> Third Party Service

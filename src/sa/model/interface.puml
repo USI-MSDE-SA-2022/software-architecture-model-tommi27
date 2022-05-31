@@ -1,0 +1,239 @@
+@startuml
+hide circle
+
+class "User Interface" {
+provides:
+--
+operations:
+..
+post(userPost)
+--
+events:
+..
+userCreatesPost
+==
+requires:
+--
+operations:
+..
+getPostById(id)
+storePost(post)
+search(keywords)
+search(categories)
+postModel(model)
+--
+properties:
+..
+keywords
+categories
+postContent
+--
+events:
+..
+searchStart
+browseStart
+searchEnd
+browseEnd
+}
+
+
+class "Search Engine" {
+provides:
+--
+operations:
+..
+search(keywords)
+--
+events:
+..
+searchStart
+searchEnd
+==
+requires:
+--
+operations:
+..
+queryDB(query)
+}
+
+
+class "Browser Engine" {
+provides:
+--
+operations:
+..
+search(categories)
+--
+events:
+..
+browseStart
+browseEnd
+==
+requires:
+--
+operations:
+..
+queryDB(query)
+--
+events:
+..
+queryStart
+queryEnd
+}
+
+class "Web Crawler Manager" {
+provides:
+--
+operations:
+..
+manage(crawlers)
+--
+properties:
+..
+crawlSpeed
+--
+events:
+..
+crawlStart
+crawlEnd
+storeStart
+storeEnd
+==
+requires:
+--
+operations:
+..
+existData()
+storeData(data)
+}
+
+class Database {
+provides:
+--
+operations:
+..
+queryDB(query)
+storeData(data)
+storePost(post)
+getPostById(id)
+--
+events:
+..
+queryStart
+queryEnd
+storeStart
+storeEnd
+}
+
+class "Messaging Tool" {
+    provides:
+    --
+    operations:
+    ..
+    send(message)
+    --
+    events:
+    sendMessage
+    receiveMessage
+    ==
+    requires:
+    --
+    operations:
+    post(userPost)
+    --
+    events:
+    ..
+    post
+}
+
+class "Recommender System" {
+    requires:
+    --
+    operations:
+    ..
+    queryDB(query)
+    search(keywords)
+    search(categories)
+    --
+    events:
+    ..
+    searchEnd
+    browseEnd
+    ==
+    provides:
+    --
+    operations:
+    ..
+    create(model)
+    train(model)
+    postModel(model)
+    --
+    events:
+    ..
+    createStart
+    createEnd
+    trainStart
+    trainEnd
+}
+
+class "Partnered Site Crawler" {
+    provides:
+    --
+    operations:
+    ..
+    existData()
+    crawl(partneredSiteURL, speed)
+    --
+    events:
+    ..
+    crawlStart
+    crawlEnd
+    ==
+    requires:
+    --
+    operations:
+    ..
+    manage(crawlers)
+    --
+    properties:
+    ..
+    crawlSpeed
+}
+
+class "Web API" {
+    requires:
+    --
+    operations:
+    ..
+    getPostById(id)
+    storePost(post)
+    search(keywords)
+    search(categories)
+    postModel(model)
+    ==
+    provides:
+    --
+    Refer to OpenAPI picture
+}
+
+
+"User Interface" -(0- "Web API"
+"User Interface" -(0- "Web API"
+"Web API" -(0- "Search Engine"
+"Web API" -(0- "Browser Engine"
+"Web API" -(0- Database
+"Web API" -(0- "Recommender System"
+"Web Crawler Manager" --(0- Database
+"Web Crawler Manager" -0)- "Partnered Site Crawler"
+"Search Engine" -(0- Database
+"Browser Engine" -(0- Database
+"Messaging Tool" --(0- "User Interface"
+"Search Engine" -0)- "Recommender System"
+"Browser Engine" -0)- "Recommender System"
+"Recommender System" -(0- Database
+
+
+
+skinparam monochrome true
+skinparam shadowing false
+@enduml

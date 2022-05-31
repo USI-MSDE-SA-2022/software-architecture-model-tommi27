@@ -1,0 +1,52 @@
+
+/// First the Feature Tree
+
+/// Adding [*] before the feature name will make it Required
+/// Adding [ ] before the feature name will mark it as Optional
+
+/// Composite features can express constraints between their sub-features
+/// { } a set of exclusive features (pick one)
+/// ( ) any combination of the features is possible
+/// [ ] a set of features (usually combined with the [*] [ ] annotation)
+
+Website : [
+    [*] Web Crawler,
+    [*] User Interface : [
+        [*] Search Engine : (
+            Category Search : (
+                By Seller,
+                By Product Type
+            ),
+            Keyword Search
+        ),
+        [*] User Posts : (
+            Product Post,
+            Comment on Product Post,
+            Private Direct Message
+        ),
+        [*] User Profile
+    ],
+    [*] Data Storage : [
+        [ ] Cache,
+        [*] Database
+    ],
+    [ ] Recommender System : {
+        Content-Based,
+        Collaborative
+    }
+]
+
+/// Then the feature relationships
+
+/// Implication
+Category Search => Database
+Keyword Search => Database
+Category Search => Cache
+Keyword Search => Cache
+Cache => Database
+Content-Based => Database
+Database => Product Post
+Collaborative => User Profile
+
+/// Exclusive
+Alternative Sub Feature1 <--> Sub Feature2
