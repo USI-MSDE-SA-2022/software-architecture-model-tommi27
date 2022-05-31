@@ -2145,3 +2145,347 @@ Good: 1, two out of 2-5.
 Exceed: 1-5.
 
 }
+
+## 1. New Use Case Scenario
+
+The new scenario consists in adding a machine that would hold a data lake within our system with the purpose of data analytics. Instead of throwing away older entries in favour of new ones, we keep all the products that we crawl and we run statistical analyses such as the most popular category of product or the average price for a certain producer over time, for instance.
+
+### Logical View
+
+```puml
+@startuml
+skinparam componentStyle rectangle
+
+!include <tupadr3/font-awesome/database>
+
+title Internet Marketplace Logical View
+
+
+component FE as "Frontend (HTML, CSS, JavaScript)" {
+  component FRAPI as "Frontend API (RESTful)"
+  component UI as "User Interface" {
+    component PV as "Product View"
+    component SB as "Search Bar"
+    component CB as "Category Browser"
+    component "User Posts" as UP {
+      component "Non-Product Post" as NPP 
+      component "Product Post" as PP
+    }
+  }
+  [Messaging Tool] as MT
+  interface " " as MTI
+  interface " " as UII
+}
+
+[System API (RESTful)] as API
+
+component BE as "Backend" {
+  component BAPI as "Backend API (RESTful)"
+  component DB as "Database (MongoDB)"
+  interface " " as WCI
+  interface " " as DBI
+  interface " " as SEI
+  interface " " as BREI
+  interface " " as RSI
+  component SE as "Search Engine (Elasticsearch)"
+  component RS as "Recommender System"
+  component BRE as "Browser Engine (Elasticsearch)"
+  component WC as "Web Crawler (Scrapy)"
+  interface " " as TPSI
+  [Machine Learning (scikit-learn)] as ML
+  interface " " as MLI
+  interface " " as DLI
+  component DL as "Data Lake"
+}
+
+[Third Party Service] as TPS
+
+interface " " as FEI
+API -- FEI
+FEI )-- FE
+
+interface " " as BEI
+API -( BEI
+BEI - BE
+
+FRAPI -- MTI
+MTI )-- MT
+
+UI - UII
+UII )-- FRAPI
+
+WC -( TPSI
+TPSI - TPS
+
+BAPI - WCI
+WCI )- WC
+
+DB - DBI
+DBI )- BAPI
+
+SE --( SEI
+SEI -- BAPI
+
+BAPI -- BREI
+BREI )-- BRE
+
+RS --( RSI
+RSI -- BAPI
+
+BAPI -- MLI
+MLI )-- ML
+
+DL -- DLI
+DLI )-- BAPI
+
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
+
+### Process View
+
+```puml
+@startuml
+title User Post or Crawled Data
+
+participant "User Interface" as UI
+participant "User Posts" as UP
+participant "Messaging Tool" as MT
+participant "Frontend API" as FRAPI
+
+participant "System API" as API
+
+participant "Web Crawler" as WC
+participant "Search Engine" as SE
+participant "Browser Engine" as BE
+participant "Recommender System" as RS
+participant "Backend API" as BAPI
+participant "Machine Learning" as ML
+participant "Database" as DB
+participant "Data Lake" as DL
+
+participant "Third Party Site" as TPS
+
+alt User Posts Product
+UI -> FRAPI: POST Product
+UI -> API: POST Product
+API -> DB: db.products.insert(product)
+API -> DL: db.products.insert(product)
+DB -> BAPI: Send Updated Data
+BAPI -> BE: Update with New Post
+BAPI -> SE: Update with New Post
+
+else Crawl Data
+WC -> TPS: GET Third Party Site URL and crawl
+TPS -> WC: Return Found Data
+WC -> BAPI: Send Crawled Data
+BAPI -> DB: db.products.insert(data)
+BAPI -> DL: db.products.insert(data)
+DB -> BAPI: Send Updated Data
+BAPI -> BE: Update with New Data
+BAPI -> SE: Update with New Data
+end
+
+BE -> API: Send Updated Search Results
+SE -> API: Send Updated Search Results
+
+API -> UI: POST Updated Products
+
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
+
+### Deployment View
+
+![Deployment View](./deployment_flexibility.puml)
+
+## 2. Low Impact Use Case Scenario
+
+For this scenario, we choose that we want to employ the data lake that we have added in order to improve our recommender system based on the entire history of entries to provide suggestion over, for instance, the type of category or product that has been most successful and selected over the entire user base.
+
+### Process View
+
+```puml
+@startuml
+title Data Lake for Machine Learning
+
+participant "Recommender System" as RS
+participant "Backend API" as BAPI
+participant "Machine Learning" as ML
+participant "Database" as DB
+participant "Data Lake" as DL
+
+participant "Third Party Site" as TPS
+
+RS -> DL: Request Training Data
+DL -> RS: Return Data
+RS -> ML: Send Requested Data
+ML -> ML: model = sklearn.linear_model.LinearRegression()/model.fit(data)
+ML -> BAPI: Send Trained Model
+BAPI -> RS: Send Trained Model
+
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
+
+## 3. Change Impact
+
+Our main (and only) external dependency comprises external websites to crawl the data from. These websites will be crawled either via an API when available or via CSS selectors.
+
+The one instance in which we will be affected by a breaking change in such websites is the one where either the API or the CSS of the site is significantly modified.
+
+If the CSS were to change without an available API or, in case an API exists, both the CSS and the API were to change, we would have to rewrite the crawler as there is no other way to get new data other than by evolving alongside the external dependency.
+In such case, we hope that the partnered website will warn us in advance to allow us to change the crawlers in time.
+
+If both CSS and API exist and only one of them changes, then we can design the crawlers to be able to use both, using the API as default. If a change to either part happens, we could use an adapter and a wrapper that keep track of the existence and availability of the API and the CSS of the partnered website. Given that the crawler supports both, if one of them were to break, the adapter could guide the crawler to use the other option that is still available.
+
+That way, in this situation, the impact of a breaking change is successfully mitigated and the crawler can be improved to support the new change to the API/CSS while it will still crawl via the CSS/API.
+
+### Logical View
+
+For the logical view, you can refer to the one from exercise 12 where we introduce wrappers. In particular, the wrapper that contains the third party site and the third party API.
+
+```puml
+@startuml
+skinparam componentStyle rectangle
+
+!include <tupadr3/font-awesome/database>
+
+title Internet Marketplace Logical View
+
+component FE as "Frontend (HTML, CSS, JavaScript)" {
+  component FRAPI as "Frontend API (RESTful)"
+  component UI as "User Interface" {
+    component PV as "Product View"
+    component SB as "Search Bar"
+    component CB as "Category Browser"
+    component "User Posts" as UP {
+      component "Non-Product Post" as NPP 
+      component "Product Post" as PP
+    }
+  }
+  [Messaging Tool] as MT
+  interface " " as MTI
+  interface " " as UII
+}
+
+[System API (RESTful)] as API
+interface " " as BEI
+
+component BE as "Backend" {
+  component BAPI as "Backend API (RESTful)"
+  component DB as "Database (MongoDB)"
+  interface " " as WCI
+  interface " " as DBI
+  interface " " as SEI
+  interface " " as BREI
+  interface " " as RSI
+  component SE as "Search Engine (Elasticsearch)"
+  component RS as "Recommender System"
+  component BRE as "Browser Engine (Elasticsearch)"
+  component WC as "Web Crawler (Scrapy)"
+  interface " " as TPSI
+  [Machine Learning (scikit-learn)] as ML
+  interface " " as MLI
+}
+
+component "Crawl Wrapper" {
+
+  [Third Party Service] as TPS
+
+  [Third Party API] as TAPI
+  interface " " as TAPII
+
+}
+
+interface " " as FEI
+API -- FEI
+FEI )-- FE
+
+API -( BEI
+BEI - BE
+
+FRAPI -- MTI
+MTI )-- MT
+
+UI - UII
+UII )-- FRAPI
+
+WC -( TPSI
+TPSI -- TAPI
+
+BAPI - WCI
+WCI )- WC
+
+DB - DBI
+DBI )- BAPI
+
+SE --( SEI
+SEI -- BAPI
+
+BAPI -- BREI
+BREI )-- BRE
+
+RS --( RSI
+RSI -- BAPI
+
+BAPI -- MLI
+MLI )-- ML
+
+TAPI -( TAPII
+TAPII - TPS
+
+skinparam shadowing false
+skinparam defaultFontName Courier
+@enduml
+```
+
+And, to this wrapper, we would add some code to support the functionality we described similar to the following pseudocode.
+
+```
+class ThirdPartySite {
+  private string siteName
+  private bool hasApi
+  private bool hasCss
+
+  constructor(string siteName, bool hasApi, bool hasCss) {
+    this.siteName = siteName
+    this.hasApi = hasApi
+    this.hasCss = hasCss
+  }
+
+  public onApiChange() {
+    hasApi = false
+  }
+
+  public onCssChange() {
+    hasCss = false
+  }
+
+  public useApi() {
+    hasApi = true
+  }
+
+  public useCss() {
+    hasCss = true
+  }
+
+  public checkAvailability() {
+    // prioritize API over anything else if it exists
+    if (hasApi) {
+      crawlWithApi(siteName)
+    } else if (hasCss) {
+      crawlWithCss(siteName)
+    } else {
+      // signal that crawler needs to be rewritten
+    }
+  }
+}
+```
