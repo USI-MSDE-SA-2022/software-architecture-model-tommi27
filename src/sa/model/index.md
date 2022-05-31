@@ -1892,7 +1892,7 @@ Exceed: 1, 2, 3, 4, 5 then redo 1, 2, 3 for different scalability dimensions
 
 ## 1. Scalability Dimension
 
-The scalability dimension that we choose the number of clients. This is probably the most relevant dimension that concerns our project. Given that the project will be a website that aims to handle a large number of requests from many users, this is the dimension that we expect to deal with the most.
+The scalability dimension that we choose is the number of clients. This is probably the most relevant dimension that concerns our project. Given that the project will be a website that aims to handle a large number of requests from many users, this is the dimension that we expect to deal with the most.
 
 ## 2. Bottleneck
 
